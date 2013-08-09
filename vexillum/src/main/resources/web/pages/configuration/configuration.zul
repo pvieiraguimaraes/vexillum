@@ -1,0 +1,61 @@
+<zk>
+	<hbox apply="${pageConfigurationComposer}">
+		<vbox>
+			<hbox width="100%" align="center" pack="center">
+				<label value="Categorias:"/>
+				<combobox id="comboCatUser" width="150px" model="@{controller.userPropertiesCategory}" 
+				selectedItem="@{controller.selectedUserCategory}" 
+				sclass="comboPageProperties"
+				onChange="controller.getPropertiesByUserCategory()">
+					<comboitem self="@{each=cat}" label="@{cat.name}" />
+				</combobox>
+			</hbox>
+			
+			<separator width="15px"/>
+			
+			<listbox model="@{controller.listUserProperties load-when='comboCatUser.onChange'}"
+				hflex="min" itemRenderer="@{controller.configurationRenderer}"
+				onAfterRender='self.clearSelection();' sclass="listPageProperties">		
+				<auxhead>
+					<auxheader colspan="3" label="User Configurations" align="center"/>
+				</auxhead>	
+				<listhead sclass="listheadPageProperties">
+					<listheader label="Propriedade" width="100px" />
+					<listheader label="Descrição" width="255px" />
+					<listheader label="Valor" width="100px" align="center"/>
+					<listheader label="Default" width="60px" align="center"/>
+				</listhead>
+			</listbox>
+		</vbox>
+		
+		<separator width="30px"/>
+			
+		<vbox if="br.com.vexillum.view.isAdministrator()">
+			<hbox width="100%" align="center" pack="center">
+				<label value="Categorias:"/>
+				<combobox id="comboCatSystem" width="150px" model="@{controller.systemPropertiesCategory}" 
+				selectedItem="@{controller.selectedSystemCategory}" 
+				sclass="comboPageProperties"
+				onChange="controller.getPropertiesBySystemCategory()">
+					<comboitem self="@{each=cat}" label="@{cat.name}" />
+				</combobox>
+			</hbox>
+			
+			<separator width="15px"/>
+			
+			<listbox model="@{controller.listSystemProperties load-when='comboCatSystem.onChange'}"
+			hflex="min" itemRenderer="@{controller.systemPropertiesRenderer}"
+			onAfterRender='self.clearSelection();'>	
+				<auxhead>
+					<auxheader colspan="3" label="System Properties" align="center"/>
+				</auxhead>			
+				<listhead sclass="listheadPageProperties">
+					<listheader label="Propriedade" width="100px" />
+					<listheader label="Descrição" width="255px" />
+					<listheader label="Valor" width="100px" align="center"/>
+					<listheader label="Default" width="60px" align="center"/>
+				</listhead>
+			</listbox>
+		</vbox>
+	</hbox>
+</zk>
