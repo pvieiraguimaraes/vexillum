@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.vexillum.model.Category;
 import br.com.vexillum.model.UserBasic;
-import br.com.vexillum.util.EncryptUtils;
 import br.com.vexillum.util.Return;
 
 @Service
@@ -36,7 +35,7 @@ public class UserBasicControl<U extends UserBasic> extends GenericControl<U> {
 	public U getUser(String name, String password) {
 		UserBasic user = new UserBasic();
 		user = getUserByMail(name);
-		if (user != null && user.getPassword().equals(EncryptUtils.encryptOnSHA512(password)) && user.isActive())
+		if (user != null && user.getPassword().equals(password) && user.isActive())
 			return (U) user;
 		return null;
 
