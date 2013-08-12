@@ -182,11 +182,21 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 	public Return validateSelectedEntity() {
 		Return ret = new Return(true);
 		if (getSelectedEntity() == null) {
-			String key = (entity.getClass().getSimpleName() + "_"
-					+ "selectedentity" + "_" + false).toLowerCase();
-			ret = new Return(false, new Message(null, messages.getKey(key)));
+			ret = new Return(false, getSelectedErrorMessage(entity.getClass().getSimpleName()));
 		}
 		return ret;
+	}
+	
+	protected Message getSelectedErrorMessage(String className){
+		Message mes = null;
+		String key = (className + "_" + "selectedentity" + "_" + false).toLowerCase();
+		String message = messages.getKey(key);
+		if(message == null){
+			key = ("selectedentity" + "_" + false).toLowerCase();
+			message = messages.getKey(key);
+		}
+		mes = new Message(null, message);
+		return mes;
 	}
 
 	public void disableComponentsNoUpdatables(Component comp) {
@@ -220,8 +230,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 		};
 
 		if (ret.isValid()) {
-			Messagebox.show(message, "Confirmação", Messagebox.OK
-					| Messagebox.CANCEL, Messagebox.QUESTION, evt);
+			showWindowConfirmation(message, evt);
 		} else {
 			treatReturn(ret);
 		}
@@ -232,8 +241,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 		Return ret = validateSelectedEntity();
 
 		if (ret.isValid()) {
-			Messagebox.show(message, "Confirmação", Messagebox.OK
-					| Messagebox.CANCEL, Messagebox.QUESTION, event);
+			showWindowConfirmation(message, event);
 		} else {
 			treatReturn(ret);
 		}

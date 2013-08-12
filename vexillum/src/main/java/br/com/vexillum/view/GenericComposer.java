@@ -8,12 +8,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zkplus.databind.AnnotateDataBinder;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.manager.ConfigurationManager;
@@ -221,6 +224,10 @@ public class GenericComposer<U extends UserBasic> extends
 			}
 		}
 		return null;
+	}
+	
+	public void showWindowConfirmation(String message, EventListener<Event> event){
+		Messagebox.show(message, "Confirmação", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, event);
 	}
 
 	/**

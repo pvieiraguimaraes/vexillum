@@ -13,4 +13,5 @@ public @interface Validate {
 	int max() default 0;
 	boolean past() default false;
 	boolean future() default false;
+	boolean email() default false;
 }

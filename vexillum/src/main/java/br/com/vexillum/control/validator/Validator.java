@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.util.StringUtils;
@@ -211,6 +212,17 @@ public class Validator {
 		} 
 		return ret;
 	}
+	
+	public Return email(String name, Object valField, Object valAnoted){
+		Return ret = new Return(true);
+		String regex = "^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]*(.){1}[a-zA-Z]{2,4})+$";
+		if((Boolean) valAnoted){
+			if(valField == null || !Pattern.matches(regex, (String) valField))
+				ret = creatReturn(name, getValidationMessage(name, "email", false));
+		} 
+		return ret;
+	}
+	
 	
 	public Return equalsFields(String field1, String field2){
 		Return ret = new Return(true);	

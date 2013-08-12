@@ -114,7 +114,14 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	@SuppressWarnings("rawtypes")
 	private Class getValidatorClass() throws ClassNotFoundException{
 		ValidatorClass an = entity.getClass().getAnnotation(ValidatorClass.class);
-		if(entity != null && an != null){
+		Class superc = entity.getClass().getSuperclass();
+		
+		while(an == null && superc != null){
+			an = (ValidatorClass) superc.getAnnotation(ValidatorClass.class);
+			superc = superc.getSuperclass();
+		}
+		
+		if(an != null){
 			return Class.forName(an.validatorClass());
 		}
 		return Validator.class;
