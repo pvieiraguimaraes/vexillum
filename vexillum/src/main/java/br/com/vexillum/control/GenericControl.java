@@ -164,7 +164,12 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	}
 	
 	public Return searchByHQL(){
-		return persistence.searchByHQL((String) data.get("sql"));
+		if(data.get("sql") != null){
+			return persistence.searchByHQL((String) data.get("sql"));
+		} else {
+			return persistence.searchByHQL(entity);
+		}
+		
 	}
 	
 	//TODO Arrumar uma forma de detectar se é a pesquisa por entidade ou pela hql

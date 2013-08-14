@@ -179,10 +179,76 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		return ret;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Return searchByHQL(ICommonEntity entity) {
-		// TODO Criar pesqusia pela HQL usando a entidade
-		return null;
+		Return ret = new Return(true);
+		List<E> lista = new ArrayList<E>();
+        
+        try{
+	        String hql = "FROM " + entity.getClass().getSimpleName() + " WHERE ";
+	        
+	        List<String> criterias = setCriterias(entity, null);
+	
+	        if(criterias.size() == 0) return ret;
+	        
+	        String groupedCriterias = null;
+	        
+	        if(criterias.size() > 1){
+	            for(int i = 1; i < criterias.size(); i++){
+	                if(groupedCriterias == null){
+	                	groupedCriterias = criterias.get(0) + " AND " + criterias.get(1);
+	                } else {
+	                	groupedCriterias += " AND " + criterias.get(i);
+	                }
+	            }
+	            hql = hql.concat(groupedCriterias);
+	        } else {
+	        	hql = hql.concat(criterias.get(0));
+	        }
+	        
+	        lista.addAll(getSession().createQuery(hql).list());   
+	        ret.concat(new Return(true, lista));
+        } catch (Exception e){        	
+        	ret = new ExceptionManager(e).treatException();
+        }
+        return ret;
+	}
+	
+	private List<String> setCriterias(ICommonEntity entity, String prefix){
+		List<String> criterias = new ArrayList<String>();
+		 try {
+			List<Field> listFields = ReflectionUtils.getSearchFieldsNotNull(entity);
+			
+			for (Field field : listFields) {
+				Object value = field.get(entity);
+				if(value instanceof ICommonEntity){
+	        		ICommonEntity searchEntity = (ICommonEntity) value;
+	        		if(searchEntity.getId() == null){
+	        			criterias.addAll(setCriterias(searchEntity, field.getName()));
+	        		} else {
+	        			criterias.add(field.getName() + "=" + value);
+	        		}
+	        	} else if(!(value instanceof Long || value instanceof Integer || value instanceof Boolean)){
+	        		criterias.add(field.getName() + " like " + "'%" + value + "%'");
+	        	} else {
+	        		criterias.add(field.getName() + "=" + "'" + value + "'");
+	        	}
+			}
+			addPrefixOnList(prefix, criterias);
+		} catch (Exception e) {
+			new ExceptionManager(e).treatException();
+		}
+		return criterias;
+	}
+	
+	private void addPrefixOnList(String prefix, List<String> list){
+		if(prefix != null){
+			for (int i = 0; i < list.size(); i++) {
+				String cond = prefix.concat(".".concat(list.get(i)));
+				list.set(i, cond);
+			}
+		}
 	}
 
 	@Override
