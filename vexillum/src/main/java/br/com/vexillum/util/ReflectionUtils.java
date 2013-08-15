@@ -95,7 +95,7 @@ public class ReflectionUtils {
 	public static List<Field> getSearchFieldsNotNull(ICommonEntity entity)
 			throws Exception {
 		ArrayList<Field> resultList = new ArrayList<Field>();
-		for (Field field : getSearchFields(entity)) {
+		for (Field field : getSearchFields(entity, false)) {
 			field.setAccessible(true);
 			if (field.get(entity) != null) {
 				resultList.add(field);
@@ -104,12 +104,39 @@ public class ReflectionUtils {
 		return resultList;
 	}
 
-	public static List<Field> getSearchFields(ICommonEntity entity)
+	public static List<Field> getSearchFields(ICommonEntity entity, Boolean instropect)
 			throws Exception {
 		ArrayList<Field> resultList = new ArrayList<Field>();
 		for (Field field : ReflectionUtils.getFields(entity.getClass())) {
 			if (field.isAnnotationPresent(SearchField.class)) {
-				resultList.add(field);
+				SearchField annotation = field.getAnnotation(SearchField.class);
+				if(annotation.introspect() && instropect){
+					field.setAccessible(true);
+					resultList.addAll(getSearchFields((ICommonEntity) field.get(entity), instropect));
+				} else {
+					resultList.add(field);
+				}
+			}
+		}
+		return resultList;
+	}
+	
+	public static List<Field> getSearchFields(ICommonEntity entity) throws Exception{
+		return getSearchFields(entity, false);
+	}
+	
+	public static Map<Field, Object> getSearchFieldsAndValues(ICommonEntity entity, Boolean instropect)
+			throws Exception {
+		Map<Field, Object> resultList = new HashMap<Field, Object>();
+		for (Field field : ReflectionUtils.getFields(entity.getClass())) {
+			if (field.isAnnotationPresent(SearchField.class)) {
+				SearchField annotation = field.getAnnotation(SearchField.class);
+				field.setAccessible(true);
+				if(annotation.introspect() && instropect){
+					resultList.putAll(getSearchFieldsAndValues((ICommonEntity) field.get(entity),instropect));
+				} else {
+					resultList.put(field, field.get(entity));
+				}
 			}
 		}
 		return resultList;
