@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.vexillum.configuration.Properties;
-import br.com.vexillum.control.manager.EmailManager;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.control.persistence.GenericPersistence;
 import br.com.vexillum.control.validator.Validator;
@@ -73,9 +72,13 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	}
 	
 	public Return doAction(final String action) {
+		return doAction(action, true);
+	}		
+	
+	public Return doAction(final String action, Boolean transactionControlled) {
 		Return ret = new Return(true);
 		try {
-			persistence.beginTransaction();
+			beginTransaction(transactionControlled);
 			data.put("action", action);
 //			Method m = rclass.getMethod(action, new Class[]{});
 			ret.concat(validateEntity(action));
@@ -83,13 +86,13 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 				ret.concat((Return) (thisClass.getMethod(action, new Class[]{})).invoke(this, new Object[]{}));
 			} 
 			if(ret.isValid()){
-				persistence.commitTransaction();
+				commitTransaction(transactionControlled);
 				ret.addMessage(getActionMessage(ret, action));
 			} else {
-				persistence.rollbackTransaction();
+				rollbackTransaction(transactionControlled);
 			}
 		} catch (Exception e) {
-			persistence.rollbackTransaction();
+			rollbackTransaction(transactionControlled);
 			ret.concat(new ExceptionManager(e).treatException());
 		} 
 		return ret;
@@ -185,8 +188,22 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		return persistence.listAll((Class<CommonEntity>) classEntity);
 	}
 	
-	public Return sendEmail(){
-		EmailManager email = new EmailManager("SimpleEmail");
-		return email.sendActivationEmail("fernando.slopes.21@gmail.com");
+	private void beginTransaction(Boolean transactionControlled){
+		if(transactionControlled){
+			persistence.beginTransaction();
+		}
 	}
+	
+	private void commitTransaction(Boolean transactionControlled){
+		if(transactionControlled){
+			persistence.commitTransaction();
+		}
+	}
+	
+	private void rollbackTransaction(Boolean transactionControlled){
+		if(transactionControlled){
+			persistence.rollbackTransaction();
+		}
+	}
+	
 }
