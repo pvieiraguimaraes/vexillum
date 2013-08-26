@@ -26,7 +26,7 @@ import br.com.vexillum.model.enums.Sexo;
 @Table(name = "users")
 public class UserBasic extends CommonEntity {
 
-	@Validate(notNull = true, min = 5, max = 50)
+	@Validate(notNull = true, min = 2, max = 50)
 	@SearchField
 	@Column(name = "name", unique = false, nullable = false, updatable = true, length = 200)
 	private String name;
