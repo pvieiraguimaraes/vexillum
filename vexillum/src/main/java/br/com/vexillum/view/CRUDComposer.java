@@ -90,10 +90,14 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 	}
 
 	public Return saveEntity() {
+		return saveEntity(true);
+	}
+	
+	public Return saveEntity(Boolean transactionControlled) {
 		if (getEntity().getId() != null && getEntity().getId() != 0) {
-			return getControl().doAction("update");
+			return getControl().doAction("update", transactionControlled);
 		}
-		return getControl().doAction("save");
+		return getControl().doAction("save", transactionControlled);
 	}
 
 	public Return deactivateEntity() {
@@ -102,7 +106,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 
 	@SuppressWarnings("unchecked")
 	public Return searchEntitys() {
-		Return ret = getControl().doAction("searchByCriteria");
+		Return ret = getControl().doAction("searchByCriteria", false);
 		setListEntity((List<E>) ret.getList());
 		binder.loadAll();
 		return ret;
@@ -110,7 +114,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 
 	@SuppressWarnings("unchecked")
 	public Return searchByHQL() {
-		Return ret = getControl().doAction("searchByHQL");
+		Return ret = getControl().doAction("searchByHQL", false);
 		setListEntity((List<E>) ret.getList());
 		binder.loadAll();
 		return ret;
@@ -118,7 +122,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 
 	@SuppressWarnings("unchecked")
 	public Return listAll() {
-		Return ret = getControl().doAction("listAll");
+		Return ret = getControl().doAction("listAll", false);
 		setListEntity((List<E>) ret.getList());
 		binder.loadAll();
 		return ret;
