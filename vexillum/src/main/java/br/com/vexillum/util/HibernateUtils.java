@@ -1,7 +1,16 @@
 package br.com.vexillum.util;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.collection.internal.PersistentBag;
+import org.hibernate.collection.internal.PersistentList;
 import org.hibernate.proxy.HibernateProxy;
+
+import br.com.vexillum.control.manager.ExceptionManager;
 
 public class HibernateUtils {
 	
@@ -19,4 +28,37 @@ public class HibernateUtils {
 	    return entity;
 	}
 	
+	@SuppressWarnings("rawtypes")
+	public static void tranformBagsOnLists(Object o) throws Exception{
+		for(Field f : ReflectionUtils.getFields(o.getClass())){
+			f.setAccessible(true);
+			if(f.get(o) instanceof PersistentBag || f.get(o) instanceof PersistentList){
+				f.set(o, transaformBagInList((List) f.get(o)));
+			}
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static List transaformBagInList(List bag){
+		List list = new ArrayList();
+		if(bag instanceof PersistentBag){
+			for(Object o : bag){
+				list.add(o);
+			}
+		} else {
+			list = bag;
+		}
+		
+		return list;
+	}
+	
+	public static void detachObject(Object o, Session session){
+		try {
+			Object obj = materializeProxy(o);
+			tranformBagsOnLists(obj);
+			session.evict(o);
+		} catch (Exception e) {
+			new ExceptionManager(e).treatException();
+		}
+	}
 }
