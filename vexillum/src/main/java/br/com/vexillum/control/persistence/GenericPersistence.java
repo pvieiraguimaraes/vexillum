@@ -169,7 +169,7 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		Return ret = null;
 		try {
 //			beginTransaction();
-			getSession().update(entity);
+			getSession().update(getSession().merge(entity));
 //			commitTransaction();
 			ret = new Return(true);
 		} catch (Exception e) {

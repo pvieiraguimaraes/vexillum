@@ -10,6 +10,7 @@ import br.com.vexillum.control.validator.Validator;
 import br.com.vexillum.model.CommonEntity;
 import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.model.annotations.ValidatorClass;
+import br.com.vexillum.util.HibernateUtils;
 import br.com.vexillum.util.Message;
 import br.com.vexillum.util.Return;
 import br.com.vexillum.util.SpringFactory;
@@ -201,9 +202,14 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	}
 	
 	private void rollbackTransaction(Boolean transactionControlled){
+		
 		if(transactionControlled){
 			persistence.rollbackTransaction();
 		}
+	}
+	
+	public void detachObject(Object o){
+		HibernateUtils.detachObject(o, persistence.getSession());
 	}
 	
 }
