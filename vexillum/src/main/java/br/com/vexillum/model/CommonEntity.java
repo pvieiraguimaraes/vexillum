@@ -1,7 +1,5 @@
 package br.com.vexillum.model;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -10,6 +8,7 @@ import javax.persistence.MappedSuperclass;
 import org.hibernate.annotations.GenericGenerator;
 
 import br.com.vexillum.model.annotations.SearchField;
+import br.com.vexillum.util.CloneUtils;
 
 /**
  * @author Pedro Henrique, Entidade master todas as classes
@@ -18,7 +17,7 @@ import br.com.vexillum.model.annotations.SearchField;
  */
 @SuppressWarnings({ "serial" })
 @MappedSuperclass
-public abstract class CommonEntity implements Serializable, ICommonEntity {
+public abstract class CommonEntity implements ICommonEntity {
 
 	@SearchField
 	@Id
@@ -33,6 +32,10 @@ public abstract class CommonEntity implements Serializable, ICommonEntity {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public ICommonEntity cloneEntity(){
+		return (ICommonEntity) CloneUtils.cloneSerializable(this);
 	}
 	
 	@Override
@@ -65,5 +68,5 @@ public abstract class CommonEntity implements Serializable, ICommonEntity {
 	public boolean isNew(){
         return this.getId()==null || this.getId().intValue()==0;
 	}
-
+	
 }

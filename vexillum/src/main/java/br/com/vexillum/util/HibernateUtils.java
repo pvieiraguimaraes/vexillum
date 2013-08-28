@@ -11,6 +11,7 @@ import org.hibernate.collection.internal.PersistentList;
 import org.hibernate.proxy.HibernateProxy;
 
 import br.com.vexillum.control.manager.ExceptionManager;
+import br.com.vexillum.model.ICommonEntity;
 
 public class HibernateUtils {
 	
@@ -54,9 +55,40 @@ public class HibernateUtils {
 	
 	public static void detachObject(Object o, Session session){
 		try {
-			Object obj = materializeProxy(o);
-			tranformBagsOnLists(obj);
+			o = materializeProxy(o);
+			initializeLists(o);
 			session.evict(o);
+		} catch (Exception e) {
+			new ExceptionManager(e).treatException();
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static void initializeLists(Object o) throws Exception{
+		for(Field f : ReflectionUtils.getFields(o.getClass())){
+			f.setAccessible(true);
+			Object obj = f.get(o);
+			if(obj instanceof ICommonEntity){
+				initializeLists(obj);
+			} else if(obj instanceof PersistentBag || obj instanceof PersistentList){
+//				Hibernate.initialize(obj);
+				initializeListElements((List) obj);
+			}
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static void initializeListElements(List list){
+		for(Object o : list){
+			Hibernate.initialize(o);
+			initialize(o);
+		}
+	}
+	
+	public static void initialize(Object o){
+		try {
+			o = materializeProxy(o);
+			initializeLists(o);
 		} catch (Exception e) {
 			new ExceptionManager(e).treatException();
 		}
