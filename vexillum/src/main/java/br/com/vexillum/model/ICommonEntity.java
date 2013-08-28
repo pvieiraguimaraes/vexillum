@@ -1,8 +1,11 @@
 package br.com.vexillum.model;
 
-public interface ICommonEntity {
+import java.io.Serializable;
+
+public interface ICommonEntity extends Serializable {
 
 	public Long getId();
 	public void setId(Long id);
+	public ICommonEntity cloneEntity();
 	
 }
