@@ -56,7 +56,7 @@ public class HibernateUtils {
 	public static void detachObject(Object o, Session session){
 		try {
 			o = materializeProxy(o);
-			initializeLists(o);
+			initializeObjectElements(o);
 			session.evict(o);
 		} catch (Exception e) {
 			new ExceptionManager(e).treatException();
@@ -64,14 +64,13 @@ public class HibernateUtils {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static void initializeLists(Object o) throws Exception{
+	public static void initializeObjectElements(Object o) throws Exception{
 		for(Field f : ReflectionUtils.getFields(o.getClass())){
 			f.setAccessible(true);
 			Object obj = f.get(o);
 			if(obj instanceof ICommonEntity){
-				initializeLists(obj);
+				initialize(obj);
 			} else if(obj instanceof PersistentBag || obj instanceof PersistentList){
-//				Hibernate.initialize(obj);
 				initializeListElements((List) obj);
 			}
 		}
@@ -80,7 +79,6 @@ public class HibernateUtils {
 	@SuppressWarnings("rawtypes")
 	public static void initializeListElements(List list){
 		for(Object o : list){
-			Hibernate.initialize(o);
 			initialize(o);
 		}
 	}
@@ -88,7 +86,7 @@ public class HibernateUtils {
 	public static void initialize(Object o){
 		try {
 			o = materializeProxy(o);
-			initializeLists(o);
+			initializeObjectElements(o);
 		} catch (Exception e) {
 			new ExceptionManager(e).treatException();
 		}
