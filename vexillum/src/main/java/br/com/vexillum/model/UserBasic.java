@@ -24,7 +24,7 @@ import br.com.vexillum.model.enums.Sexo;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER)
 @Table(name = "users")
-public class UserBasic extends CommonEntity {
+public class UserBasic extends CommonEntityActivated {
 
 	@Validate(notNull = true, min = 2, max = 200)
 	@SearchField
@@ -36,7 +36,7 @@ public class UserBasic extends CommonEntity {
 	@Column(name = "email", unique = true, nullable = false, updatable = false, length = 200)
 	private String email;
 
-	@Validate(notNull = true, min = 6, max = 50)
+	@Validate(notNull = true, min = 6, max = 300)
 	@Column(name = "password", unique = false, nullable = false, updatable = true, length = 200)
 	private String password;
 
@@ -56,9 +56,6 @@ public class UserBasic extends CommonEntity {
 	@Column(name = "verification_code", unique = false, nullable = true, updatable = true, length = 256)
 	private String verificationCode;
 	
-	@Column(name = "active", nullable = false)
-	private Boolean active;
-
 	public String getName() {
 		return name;
 	}
@@ -115,11 +112,4 @@ public class UserBasic extends CommonEntity {
 		this.verificationCode = verificationCode;
 	}
 
-	public Boolean isActive() {
-		return active;
-	}
-
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
 }
