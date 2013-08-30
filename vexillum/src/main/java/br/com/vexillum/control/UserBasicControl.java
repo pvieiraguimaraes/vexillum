@@ -35,7 +35,7 @@ public class UserBasicControl<U extends UserBasic> extends GenericControl<U> {
 	public U getUser(String name, String password) {
 		UserBasic user = new UserBasic();
 		user = getUserByMail(name);
-		if (user != null && user.getPassword().equals(password) && user.isActive())
+		if (user != null && user.getPassword().equals(password) && user.getActive())
 			return (U) user;
 		return null;
 

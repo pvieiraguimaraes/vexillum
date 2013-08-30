@@ -40,6 +40,17 @@ public class ReflectionUtils {
 		}
 		return methods;
 	}
+	
+	@SuppressWarnings("rawtypes")
+	public static Class[] getInterfaces(Class<?> classEntity) {
+		Class[] interfaces = classEntity.getInterfaces();
+		Class<?> superclass = classEntity.getSuperclass();
+		while (superclass != Object.class) {
+			interfaces = ArrayUtils.addAll(interfaces, superclass.getInterfaces());
+			superclass = superclass.getSuperclass();
+		}
+		return interfaces;
+	}
 
 	public static Map<String, Method> getMethodsMap(Class<?> classEntity) {
 		Map<String, Method> mapMethods = new HashMap<String, Method>();
@@ -161,6 +172,16 @@ public class ReflectionUtils {
 	public static boolean haveMethod(String methodName, Class searchClass) {
 		for (Method method : getMethods(searchClass)) {
 			if (method.getName().equalsIgnoreCase(methodName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static boolean haveInterface(String interfaceName, Class searchClass) {
+		for (Class classi : getInterfaces(searchClass)) {
+			if (classi.getSimpleName().equalsIgnoreCase(interfaceName)) {
 				return true;
 			}
 		}
