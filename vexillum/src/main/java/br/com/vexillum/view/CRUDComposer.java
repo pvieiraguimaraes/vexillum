@@ -146,7 +146,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 		});
 	}
 
-	private void deleteUser() {
+	protected void deleteUser() {
 		if (doAction("deleteEntity")) {
 			getListEntity().remove(getSelectedEntity());
 			setSelectedEntity(null);
