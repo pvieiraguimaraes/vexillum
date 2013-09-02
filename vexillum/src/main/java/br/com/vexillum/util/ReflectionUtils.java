@@ -1,5 +1,6 @@
 package br.com.vexillum.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -66,7 +67,7 @@ public class ReflectionUtils {
 		}
 		return mapMethods;
 	}
-
+	
 	@SuppressWarnings({ "rawtypes" })
 	public static HashMap<String, Object> prepareDataForPersistence(Object comp) {
 		HashMap<String, Object> dados = new HashMap<String, Object>();
