@@ -64,6 +64,14 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		}
 	}
 	
+	public GenericPersistence<E> getPersistence() {
+		return persistence;
+	}
+
+	public void setPersistence(GenericPersistence<E> persistence) {
+		this.persistence = persistence;
+	}
+
 	public HashMap<String, Object> getData() {
 		return data;
 	}
@@ -93,8 +101,8 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 				rollbackTransaction(transactionControlled);
 			}
 		} catch (Exception e) {
-			rollbackTransaction(transactionControlled);
 			ret.concat(new ExceptionManager(e).treatException());
+			rollbackTransaction(transactionControlled);
 		} 
 		return ret;
 	}		

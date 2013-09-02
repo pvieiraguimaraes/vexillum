@@ -12,6 +12,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.ICommonEntity;
+import br.com.vexillum.model.annotations.NotInitialize;
 
 public class HibernateUtils {
 	
@@ -63,32 +64,50 @@ public class HibernateUtils {
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
 	public static void initializeObjectElements(Object o) throws Exception{
+		initializeObjectElements(o, null);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void initializeObjectElements(Object o, List initialized) throws Exception{
 		for(Field f : ReflectionUtils.getFields(o.getClass())){
 			f.setAccessible(true);
-			Object obj = f.get(o);
-			if(obj instanceof ICommonEntity){
-				initialize(obj);
-			} else if(obj instanceof PersistentBag || obj instanceof PersistentList){
-				initializeListElements((List) obj);
+			if(f.getAnnotation(NotInitialize.class) == null){
+				Object obj = f.get(o);
+				if(obj instanceof ICommonEntity){
+					initialize(obj, initialized);
+				} else if(obj instanceof PersistentBag || obj instanceof PersistentList){
+					initializeListElements((List) obj, initialized);
+				}
 			}
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public static void initializeListElements(List list){
-		for(Object o : list){
-			initialize(o);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void initializeListElements(List list, List initialized){
+		if(list.size() > 0){
+			for(Object o : list){
+				initialize(o, initialized);
+			}
+		}
+	}
+	
+	public static void initialize(Object o, List<Object> initialized){
+		if(initialized == null) 
+			initialized = new ArrayList<Object>();
+		if(!initialized.contains(o)){
+			initialized.add(o);
+			try {
+				o = materializeProxy(o);
+				initializeObjectElements(o, initialized);
+			} catch (Exception e) {
+				new ExceptionManager(e).treatException();
+			}
 		}
 	}
 	
 	public static void initialize(Object o){
-		try {
-			o = materializeProxy(o);
-			initializeObjectElements(o);
-		} catch (Exception e) {
-			new ExceptionManager(e).treatException();
-		}
+		initialize(o, null);
 	}
+	
 }
