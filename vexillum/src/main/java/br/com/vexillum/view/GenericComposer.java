@@ -289,4 +289,21 @@ public class GenericComposer<U extends UserBasic> extends
 //		}
 	}
 	
+	@SuppressWarnings({ "unchecked" })
+	public void showConfirmationDelete(String message) {
+		EventListener evt = new EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onYes")) {
+					efectiveAction();
+				}
+			}
+		};
+		Messagebox.show(message, "Confirmação", Messagebox.YES | Messagebox.NO,
+				Messagebox.QUESTION, evt);
+	}
+	
+	/**Sobrescrever este método que será a ação que deseja executar
+	 * 
+	 */
+	private void efectiveAction() {}
 }
