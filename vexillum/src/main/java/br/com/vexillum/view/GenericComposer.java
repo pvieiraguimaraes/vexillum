@@ -305,5 +305,5 @@ public class GenericComposer<U extends UserBasic> extends
 	/**Sobrescrever este método que será a ação que deseja executar
 	 * 
 	 */
-	private void efectiveAction() {}
+	public void efectiveAction() {}
 }
