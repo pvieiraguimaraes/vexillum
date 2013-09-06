@@ -106,6 +106,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 
 	@SuppressWarnings("unchecked")
 	public Return searchEntitys() {
+		binder.saveAll();
 		Return ret = getControl().doAction("searchByCriteria", false);
 		setListEntity((List<E>) ret.getList());
 		binder.loadAll();
