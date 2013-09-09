@@ -126,6 +126,10 @@ public class GenericComposer<U extends UserBasic> extends
 		}
 		return null;
 	}
+	
+	public Component getComponentById(String id) {
+		return getComponentById(component, id);
+	}
 
 	public Component getComponentByType(Component comp, String type) {
 		if (comp.getClass().getSimpleName().equalsIgnoreCase(type)) {
