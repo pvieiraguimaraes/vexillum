@@ -78,13 +78,13 @@ public class FriendshipController extends GenericControl<Friendship> {
 	@Override
 	public Return delete() {
 		if(data.get("owner") != null && data.get("friend") != null){
-			UserBasic owner = (UserBasic) data.get("user");
-			UserBasic friend = (UserBasic) data.get("user");
+			UserBasic owner = (UserBasic) data.get("owner");
+			UserBasic friend = (UserBasic) data.get("friend");
 			String sql = "DELETE Friendship f "
 						+ "WHERE (f.owner = '" + owner.getId() + "' AND f.friend = '" + friend.getId() + "') OR "
 						+ "(f.owner = '" + friend.getId() + "' AND f.friend = '" + owner.getId() + "')";
 			data.put("sql", sql);
-			return searchByHQL(); 
+			return executeByHQL(); 
 		}
 		return super.delete();
 	}
