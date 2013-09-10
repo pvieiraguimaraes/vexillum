@@ -1,6 +1,7 @@
 package br.com.vexillum.view;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +18,11 @@ import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
 
 import br.com.vexillum.configuration.Properties;
+import br.com.vexillum.control.FriendshipController;
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.ICommonEntity;
+import br.com.vexillum.model.UserBasic;
 import br.com.vexillum.util.Message;
 import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.Return;
@@ -258,6 +261,15 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 		setSelectedEntity(null);
 		initEntity();
 		loadBinder();
+	}
+	
+	protected Return saveFriendship(UserBasic owner, UserBasic friend) {
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		data.put("owner", owner);
+		data.put("friend", friend);
+		
+		FriendshipController controller = SpringFactory.getController("friendshipController", FriendshipController.class, data);
+		return controller.doAction("save");
 	}
 
 	/**

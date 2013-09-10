@@ -3,16 +3,21 @@ package br.com.vexillum.model;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @SuppressWarnings("serial")
-public class Friendship extends CommonEntity {
+@Entity
+@Table(name="friendship")
+public class Friendship extends CommonEntityActivated {
 
 	public Friendship() {
 		super();
-		this.ativo = false;
+		setActive(false);
+		setDateFriendship(new Date());
 	}
 
 	@ManyToOne(fetch=FetchType.LAZY)
@@ -26,9 +31,6 @@ public class Friendship extends CommonEntity {
     @Column(name="date_of_friendship", unique=false, nullable=false, updatable=false)
 	private Date dateFriendship;
     
-    @Column(name="date_of_friendship", unique=false, nullable=false, updatable=true)
-	private Boolean ativo;
-
 	public UserBasic getOwner() {
 		return owner;
 	}
@@ -53,12 +55,4 @@ public class Friendship extends CommonEntity {
 		this.dateFriendship = dateFriendship;
 	}
 
-	public Boolean getAtivo() {
-		return ativo;
-	}
-
-	public void setAtivo(Boolean ativo) {
-		this.ativo = ativo;
-	}
-	
 }
