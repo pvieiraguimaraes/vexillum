@@ -23,8 +23,8 @@ public class FriendshipController extends GenericControl<Friendship> {
 			Friendship f = (Friendship) (data.get("entity") == null ? new Friendship() : data.get("entity"));
 			f.setOwner((UserBasic) data.get("owner"));
 			f.setFriend((UserBasic) data.get("friend"));
-			f.setAtivo(false);
-			data.put("entity", f);
+			f.setActive(false);
+			entity = f;
 		}
 		return super.save();
 	}
@@ -32,7 +32,7 @@ public class FriendshipController extends GenericControl<Friendship> {
 	public Return searchAllFriends(){
 		UserBasic user = (UserBasic) data.get("user");
 		String sql = "FROM Friendship f "
-					+ "WHERE (f.owner = '" + user.getId() + "' OR f.friend = '" + user.getId() + "') AND f.ativo = true";
+					+ "WHERE (f.owner = '" + user.getId() + "' OR f.friend = '" + user.getId() + "') AND f.active = true";
 		data.put("sql", sql);
 		return searchByHQL();
 	}
@@ -42,7 +42,7 @@ public class FriendshipController extends GenericControl<Friendship> {
 		String searchKey = (String) data.get("searchKey");
 		
 		String sql = "FROM Friendship f "
-					+ "WHERE ((f.owner = '" + user.getId() + "' OR f.friend = '" + user.getId() + "') AND f.ativo = true) AND "
+					+ "WHERE ((f.owner = '" + user.getId() + "' OR f.friend = '" + user.getId() + "') AND f.active = true) AND "
 					+ "((f.owner.name like '" + searchKey + "%' OR f.friend.name like '" + searchKey + "%') OR "
 					+ "(f.owner.email like '" + searchKey + "%' OR f.friend.email like '" + searchKey + "%') OR "
 					+ "(f.owner.city like '" + searchKey + "%' OR f.friend.city like '" + searchKey + "%'))";
@@ -55,7 +55,7 @@ public class FriendshipController extends GenericControl<Friendship> {
 	public Return searchFriendRequests(){
 		UserBasic user = (UserBasic) data.get("user");
 		String sql = "FROM Friendship f "
-					+ "WHERE f.friend = '" + user.getId() + "' AND f.ativo = false";
+					+ "WHERE f.friend = '" + user.getId() + "' AND f.active = false";
 		data.put("sql", sql);
 		return searchByHQL();
 	}
@@ -63,14 +63,14 @@ public class FriendshipController extends GenericControl<Friendship> {
 	public Return searchPendentRequests(){
 		UserBasic user = (UserBasic) data.get("user");
 		String sql = "FROM Friendship f "
-					+ "WHERE f.owner = '" + user.getId() + "' AND f.ativo = false";
+					+ "WHERE f.owner = '" + user.getId() + "' AND f.active = false";
 		data.put("sql", sql);
 		return searchByHQL();
 	}
 	
 	public Return activeFriend(){
 		Friendship f =  (Friendship) data.get("entity");
-		f.setAtivo(true);
+		f.setActive(true);
 		f.setDateFriendship(new Date());
 		return super.update();
 	}
