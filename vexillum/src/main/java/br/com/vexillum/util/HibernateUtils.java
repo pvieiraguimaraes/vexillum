@@ -75,7 +75,7 @@ public class HibernateUtils {
 			if(f.getAnnotation(NotInitialize.class) == null){
 				Object obj = f.get(o);
 				if(obj instanceof ICommonEntity){
-					initialize(obj, initialized);
+					f.set(o, initialize(obj, initialized));
 				} else if(obj instanceof PersistentBag || obj instanceof PersistentList){
 					initializeListElements((List) obj, initialized);
 				}
@@ -86,24 +86,31 @@ public class HibernateUtils {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void initializeListElements(List list, List initialized){
 		if(list.size() > 0){
-			for(Object o : list){
-				initialize(o, initialized);
+			for(Integer i = 0; i < list.size(); i++){
+				Object o = list.get(i);
+				list.set(i, initialize(o, initialized));
 			}
 		}
 	}
 	
-	public static void initialize(Object o, List<Object> initialized){
+	@SuppressWarnings("rawtypes")
+	public static Object initialize(Object o, List<Object> initialized){
 		if(initialized == null) 
 			initialized = new ArrayList<Object>();
 		if(!initialized.contains(o)){
 			initialized.add(o);
 			try {
 				o = materializeProxy(o);
-				initializeObjectElements(o, initialized);
+				if(o instanceof List) {
+					initializeListElements((List) o, initialized);
+				} else{
+					initializeObjectElements(o, initialized);
+				}
 			} catch (Exception e) {
 				new ExceptionManager(e).treatException();
 			}
 		}
+		return o;
 	}
 	
 	public static void initialize(Object o){
