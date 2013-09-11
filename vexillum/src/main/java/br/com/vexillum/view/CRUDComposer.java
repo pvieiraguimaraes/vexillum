@@ -128,7 +128,6 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 	public Return listAll() {
 		Return ret = getControl().doAction("listAll", false);
 		setListEntity((List<E>) ret.getList());
-		binder.loadAll();
 		return ret;
 	}
 
