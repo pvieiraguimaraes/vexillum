@@ -53,8 +53,7 @@ public class FriendshipController extends GenericControl<Friendship> {
 		String sql = "FROM Friendship f "
 					+ "WHERE ((f.owner = '" + user.getId() + "' OR f.friend = '" + user.getId() + "') AND f.active = true) AND "
 					+ "((f.owner.name like '" + searchKey + "%' OR f.friend.name like '" + searchKey + "%') OR "
-					+ "(f.owner.email like '" + searchKey + "%' OR f.friend.email like '" + searchKey + "%') OR "
-					+ "(f.owner.city like '" + searchKey + "%' OR f.friend.city like '" + searchKey + "%'))";
+					+ "(f.owner.email like '" + searchKey + "%' OR f.friend.email like '" + searchKey + "%'))";
 		data.put("sql", sql);
 		Return ret = searchByHQL();
 		ret.getList().remove(user);
