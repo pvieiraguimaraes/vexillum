@@ -33,7 +33,7 @@ public class Validator {
 	public Validator(Map<String, Object> mapData) {
 		this.mapData = mapData;
 		this.entity = (CommonEntity) mapData.get("entity");
-		this.classEntity = this.entity.getClass();
+		this.classEntity = ((this.entity == null) ? null : this.entity.getClass());
 		this.action = (String) mapData.get("action");
 		this.thisClass = this.getClass();
 		try {
