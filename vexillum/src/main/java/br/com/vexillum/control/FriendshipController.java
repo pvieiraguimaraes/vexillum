@@ -1,6 +1,7 @@
 package br.com.vexillum.control;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,14 @@ public class FriendshipController extends GenericControl<Friendship> {
 
 	public FriendshipController() {
 		super(Friendship.class);
+	}
+	
+	@Override
+	public void initControl(HashMap<String, Object> data) {
+		super.initControl(data);
+		if(entity == null){
+			entity = new Friendship();
+		}
 	}
 
 	@Override

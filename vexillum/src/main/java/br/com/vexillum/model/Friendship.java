@@ -9,7 +9,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import br.com.vexillum.model.annotations.ValidatorClass;
+
 @SuppressWarnings("serial")
+@ValidatorClass(validatorClass="br.com.vexillum.control.validator.FriendshipValidator")
 @Entity
 @Table(name="friendship")
 public class Friendship extends CommonEntityActivated {
@@ -28,7 +31,7 @@ public class Friendship extends CommonEntityActivated {
     @JoinColumn(name="id_friend", unique=false, nullable=false, updatable=false)
 	private UserBasic friend;
 	
-    @Column(name="date_of_friendship", unique=false, nullable=false, updatable=false)
+    @Column(name="date_of_friendship", unique=false, nullable=false, updatable=true)
 	private Date dateFriendship;
     
 	public UserBasic getOwner() {

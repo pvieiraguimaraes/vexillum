@@ -21,6 +21,7 @@ import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.FriendshipController;
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
+import br.com.vexillum.model.Friendship;
 import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.model.UserBasic;
 import br.com.vexillum.util.Message;
@@ -264,6 +265,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 	
 	protected Return saveFriendship(UserBasic owner, UserBasic friend) {
 		HashMap<String, Object> data = new HashMap<String, Object>();
+		data.put("entity", new Friendship());
 		data.put("owner", owner);
 		data.put("friend", friend);
 		
