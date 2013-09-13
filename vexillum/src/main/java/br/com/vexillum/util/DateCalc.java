@@ -21,10 +21,22 @@ public class DateCalc {
 	 * @param days
 	 * @return
 	 */
-	public static Date incrementDate(Date date, Integer days){
+	public static Date incrementDateInDays(Date date, Integer days){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(Calendar.DAY_OF_MONTH, days);
+		return calendar.getTime();
+	}
+	
+	/**Método que soma quantidade de anos em uma data
+	 * @param date
+	 * @param days
+	 * @return
+	 */
+	public static Date incrementDateInYears(Date date, Integer years){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.YEAR, years);
 		return calendar.getTime();
 	}
 }
