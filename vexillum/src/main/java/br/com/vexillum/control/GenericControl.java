@@ -8,6 +8,7 @@ import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.control.persistence.GenericPersistence;
 import br.com.vexillum.control.validator.Validator;
 import br.com.vexillum.model.CommonEntity;
+import br.com.vexillum.model.CommonEntityActivated;
 import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.model.annotations.ValidatorClass;
 import br.com.vexillum.util.HibernateUtils;
@@ -164,6 +165,16 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	}
 
 	public Return update(){
+		return persistence.update(entity);
+	}
+	
+	public Return deactivate(){
+		((CommonEntityActivated)entity).setActive(false);
+		return persistence.update(entity);
+	}
+	
+	public Return activate(){
+		((CommonEntityActivated)entity).setActive(false);
 		return persistence.update(entity);
 	}
 

@@ -107,6 +107,10 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 	public Return deactivateEntity() {
 		return getControl().doAction("deactivate");
 	}
+	
+	public Return activateEntity() {
+		return getControl().doAction("activate");
+	}
 
 	@SuppressWarnings("unchecked")
 	public Return searchEntitys() {
@@ -254,10 +258,49 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 			treatReturn(ret);
 		}
 	}
+	
 
 	protected void onOkDeactivationEvent() {
 		setEntity(getSelectedEntity());
 		doAction("deactivateEntity");
+		setSelectedEntity(null);
+		initEntity();
+		loadBinder();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void showActivateConfirmation(String message) {
+		Return ret = validateSelectedEntity();
+
+		EventListener evt = new EventListener() {
+			public void onEvent(Event evt) throws InterruptedException {
+				if (evt.getName().equals("onOK")) {
+					onOkActivationEvent();
+				}
+			}
+		};
+
+		if (ret.isValid()) {
+			showWindowConfirmation(message, evt);
+		} else {
+			treatReturn(ret);
+		}
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	public void showActivateConfirmation(String message, EventListener event) {
+		Return ret = validateSelectedEntity();
+
+		if (ret.isValid()) {
+			showWindowConfirmation(message, event);
+		} else {
+			treatReturn(ret);
+		}
+	}
+	
+	protected void onOkActivationEvent() {
+		setEntity(getSelectedEntity());
+		doAction("activateEntity");
 		setSelectedEntity(null);
 		initEntity();
 		loadBinder();
