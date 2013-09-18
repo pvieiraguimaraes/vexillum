@@ -293,21 +293,20 @@ public class GenericComposer<U extends UserBasic> extends
 //		}
 	}
 	
+	/**Método que exibe uma janela de confirmação para efetuar uma ação dada
+	 * @param messageQuestion, mensagem exibida para confirmação
+	 * @param nameAction, nome do método que será executado em caso afirmativo
+	 */
 	@SuppressWarnings({ "unchecked" })
-	public void showConfirmationDelete(String message) {
+	public void showActionConfirmation(String messageQuestion, final String nameAction) {
 		EventListener evt = new EventListener() {
 			public void onEvent(Event evt) throws InterruptedException {
 				if (evt.getName().equals("onYes")) {
-					efectiveAction();
+					doAction(nameAction);
 				}
 			}
 		};
-		Messagebox.show(message, "Confirmação", Messagebox.YES | Messagebox.NO,
+		Messagebox.show(messageQuestion, "Confirmação", Messagebox.YES | Messagebox.NO,
 				Messagebox.QUESTION, evt);
 	}
-	
-	/**Sobrescrever este método que será a ação que deseja executar
-	 * 
-	 */
-	public void efectiveAction() {}
 }
