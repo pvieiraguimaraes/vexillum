@@ -229,9 +229,11 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 	        		} else {
 	        			criterias.add(field.getName() + "=" + value);
 	        		}
-	        	} else if(!(value instanceof Long || value instanceof Integer || value instanceof Boolean)){
+	        	} else if(!(value instanceof Long || value instanceof Integer || value instanceof Boolean || value instanceof Enum)){
 	        		criterias.add(field.getName() + " like " + "'%" + value + "%'");
-	        	} else {
+	        	} else if(value instanceof Enum){
+	        		criterias.add(field.getName() + "=" + "'" + ((Enum<?>)value).ordinal() + "'");
+	        	}else {
 	        		criterias.add(field.getName() + "=" + "'" + value + "'");
 	        	}
 			}
