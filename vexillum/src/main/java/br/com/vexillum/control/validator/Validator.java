@@ -76,11 +76,11 @@ public class Validator {
 		Field[] campos = ReflectionUtils.getFields(entity.getClass());
 		Return ret = new Return(true);
 		try {
-			Boolean flag = false;
+			Boolean flag = true;
 			for (Field f : campos) {
 				if(f.getName().equalsIgnoreCase(name)){
 					ret.concat(validateAttribute(f));
-					flag = true;
+					flag = false;
 					break;
 				}
 			}
