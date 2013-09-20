@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.CommonEntity;
+import br.com.vexillum.model.IActivatedEntity;
 import br.com.vexillum.model.annotations.Validate;
 import br.com.vexillum.util.Message;
 import br.com.vexillum.util.ReflectionUtils;
@@ -163,7 +164,15 @@ public class Validator {
 	public Return validateUpdate(){
 		return validateModel();
 	}
+	
+	public Return validateDeactivate(){
+		return isDeactivatedEntity();
+	}
 
+	public Return validateActivate(){
+		return isActivatedEntity();
+	} 
+	
 	//INICIO METODOS DAS VALIDA��ES
 	public Return notNull(String name, Object valField, Object valAnoted){
 		Return ret = new Return(true);		
@@ -230,6 +239,24 @@ public class Validator {
 			if(!field1.equals(field2)){
 				ret.concat(new Return(false));
 			}
+		}
+		return ret;
+	}
+	
+	protected Return isActivatedEntity(){
+		Return ret = new Return(true);
+		IActivatedEntity e = (IActivatedEntity) entity;
+		if(e.getActive()){
+			ret.concat(creatReturn(null, getValidationMessage(null, "isactivated", true)));
+		}
+		return ret;
+	}
+	
+	protected Return isDeactivatedEntity(){
+		Return ret = new Return(true);
+		IActivatedEntity e = (IActivatedEntity) entity;
+		if(!e.getActive()){
+			ret.concat(creatReturn(null, getValidationMessage(null, "isdeactivated", true)));
 		}
 		return ret;
 	}
