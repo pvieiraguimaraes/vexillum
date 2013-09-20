@@ -8,7 +8,7 @@ import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.control.persistence.GenericPersistence;
 import br.com.vexillum.control.validator.Validator;
 import br.com.vexillum.model.CommonEntity;
-import br.com.vexillum.model.CommonEntityActivated;
+import br.com.vexillum.model.IActivatedEntity;
 import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.model.annotations.ValidatorClass;
 import br.com.vexillum.util.HibernateUtils;
@@ -169,12 +169,16 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	}
 	
 	public Return deactivate(){
-		((CommonEntityActivated)entity).setActive(false);
+		if(!(entity instanceof IActivatedEntity))
+			throw new IllegalArgumentException("Entidade Inválida. A mesma de ver herdar da interface IActivatedEntity!");
+		((IActivatedEntity)entity).setActive(false);
 		return persistence.update(entity);
 	}
 	
 	public Return activate(){
-		((CommonEntityActivated)entity).setActive(false);
+		if(!(entity instanceof IActivatedEntity))
+			throw new IllegalArgumentException("Entidade Inválida. A mesma de ver herdar da interface IActivatedEntity!");
+		((IActivatedEntity)entity).setActive(true);
 		return persistence.update(entity);
 	}
 
