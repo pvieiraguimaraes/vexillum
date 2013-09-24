@@ -1,5 +1,6 @@
 package br.com.vexillum.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -134,6 +135,16 @@ public class ReflectionUtils {
 	
 	public static List<Field> getSearchFields(ICommonEntity entity) throws Exception{
 		return getSearchFields(entity, false);
+	}
+	
+	public static List<Field> getAnnotatedFields(ICommonEntity entity, Class<? extends Annotation> step) {
+		ArrayList<Field> resultList = new ArrayList<Field>();
+		for (Field field : ReflectionUtils.getFields(entity.getClass())) {
+			if (field.isAnnotationPresent(step)) {
+				resultList.add(field);
+			}
+		}
+		return resultList;
 	}
 	
 	public static Map<Field, Object> getSearchFieldsAndValues(ICommonEntity entity, Boolean instropect)
