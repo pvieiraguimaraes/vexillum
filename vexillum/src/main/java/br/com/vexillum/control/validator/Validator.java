@@ -206,8 +206,8 @@ public class Validator {
 	
 	public Return past(String name, Object valField, Object valAnoted){
 		Return ret = new Return(true);		
-		if((Boolean) valAnoted){
-			if(DateUtils.round(valField, 0).before(new Date()))
+		if((Boolean) valAnoted && valField != null){
+			if(((Date) valField).before(new Date()))
 				ret = creatReturn(name, getValidationMessage(name, "past", false));
 		} 
 		return ret;
@@ -215,8 +215,8 @@ public class Validator {
 	
 	public Return future(String name, Object valField, Object valAnoted){
 		Return ret = new Return(true);		
-		if((Boolean) valAnoted){
-			if(valField == null || DateUtils.round(valField, 0).after(new Date()))
+		if((Boolean) valAnoted  && valField != null){
+			if( ((Date) valField).after(new Date()))
 				ret = creatReturn(name, getValidationMessage(name, "future", false));
 		} 
 		return ret;
