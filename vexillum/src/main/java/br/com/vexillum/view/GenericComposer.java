@@ -41,6 +41,8 @@ public class GenericComposer<U extends UserBasic> extends
 	
 	protected U userLogged;
 	
+	protected static Properties messages;
+	
 	public U getUserLogged() {
 		return userLogged;
 	}
@@ -65,6 +67,11 @@ public class GenericComposer<U extends UserBasic> extends
 		this.component = comp;
 		initBinder(component);
 		setUserLogged((U) getUserInSession());
+		try {
+			messages =  SpringFactory.getInstance().getBean("messagesProperties", Properties.class);
+		} catch (Exception e) {
+			messages = null;
+		}
 	}
 
 	protected AnnotateDataBinder initBinder(Component comp) {
@@ -166,6 +173,10 @@ public class GenericComposer<U extends UserBasic> extends
 		Properties prop = SpringFactory.getInstance().getBean(
 				"systemProperties", Properties.class);
 		return prop.getKey(key);
+	}
+	
+	public static String getMessage(String key){
+		return messages.getKey(key);
 	}
 
 	public static boolean isLogged() {
