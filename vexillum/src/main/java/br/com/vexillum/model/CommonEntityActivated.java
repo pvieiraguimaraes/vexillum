@@ -7,6 +7,10 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public class CommonEntityActivated extends CommonEntity implements IActivatedEntity {
 
+	public CommonEntityActivated() {
+		this.active = true;
+	}
+	
 	@Column(name = "active", nullable = false)
 	private Boolean active;
 	
