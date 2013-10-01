@@ -3,6 +3,8 @@ package br.com.vexillum.control;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
+
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.control.persistence.GenericPersistence;
@@ -41,6 +43,32 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 //		classEntity = ReflectionUtils.getGenericType(this);
 //	}
 	
+	public E getEntity() {
+		return entity;
+	}
+
+	public void setEntity(E entity) {
+		this.entity = entity;
+	}
+
+	public Class<E> getClassEntity() {
+		return classEntity;
+	}
+
+	public void setClassEntity(Class<E> classEntity) {
+		this.classEntity = classEntity;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Class getThisClass() {
+		return thisClass;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void setThisClass(Class thisClass) {
+		this.thisClass = thisClass;
+	}
+	
 	public GenericControl(Class<E> classEntity){
 		persistence  = SpringFactory.getInstance().getBean("genericPersistence", GenericPersistence.class);
 		thisClass = this.getClass();
@@ -53,7 +81,7 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		}
 		
 	}
-	
+
 	public void initControl(HashMap<String, Object> data){
 		setData(data);
 		if(data == null){
@@ -157,15 +185,27 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	}
 	
 	public Return save(){
-		 return persistence.save(entity);
+		 return save(entity);
 	}
 	
 	public Return delete(){
-		return persistence.delete(entity);
+		return delete(entity);
 	}
 
 	public Return update(){
+		return update(entity);
+	}
+	
+	protected Return save(E entity){
+		return persistence.save(entity);
+	}
+	
+	protected Return update(E entity){
 		return persistence.update(entity);
+	}
+	
+	protected Return delete(E entity){
+		return persistence.delete(entity);
 	}
 	
 	public Return deactivate(){

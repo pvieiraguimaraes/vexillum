@@ -12,6 +12,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.asm.commons.TryCatchBlockSorter;
 
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.CommonEntity;
@@ -39,7 +40,7 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 	}
 	
 	public Transaction getTransaction(){
-		return tx;
+		return getSession().getTransaction();
 	}
 	
 	public void beginTransaction(){
@@ -57,7 +58,12 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 	
 	public void rollbackTransaction(){
 		if(getTransaction() != null && !getTransaction().wasRolledBack()){
-			getTransaction().rollback();
+			try {
+				getTransaction().rollback();
+			} catch (Exception e) {
+				getSession().clear();
+			}
+			
 		}
 		flushSession();
 	}
@@ -227,7 +233,7 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 	        		if(searchEntity.getId() == null){
 	        			criterias.addAll(setCriterias(searchEntity, field.getName()));
 	        		} else {
-	        			criterias.add(field.getName() + "=" + value);
+	        			criterias.add(field.getName() + "=" + searchEntity.getId());
 	        		}
 	        	} else if(!(value instanceof Long || value instanceof Integer || value instanceof Boolean || value instanceof Enum)){
 	        		criterias.add(field.getName() + " like " + "'%" + value + "%'");
