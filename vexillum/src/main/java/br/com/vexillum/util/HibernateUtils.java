@@ -98,9 +98,9 @@ public class HibernateUtils {
 		if(initialized == null) 
 			initialized = new ArrayList<Object>();
 		if(!initialized.contains(o)){
-			initialized.add(o);
 			try {
 				o = materializeProxy(o);
+				initialized.add(o);
 				if(o instanceof List) {
 					initializeListElements((List) o, initialized);
 				} else{
@@ -113,8 +113,8 @@ public class HibernateUtils {
 		return o;
 	}
 	
-	public static void initialize(Object o){
-		initialize(o, null);
+	public static Object initialize(Object o){
+		return initialize(o, null);
 	}
 	
 }
