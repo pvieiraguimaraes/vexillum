@@ -2,6 +2,7 @@ package br.com.vexillum.control.persistence;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -12,7 +13,6 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.asm.commons.TryCatchBlockSorter;
 
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.CommonEntity;
@@ -235,7 +235,7 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 	        		} else {
 	        			criterias.add(field.getName() + "=" + searchEntity.getId());
 	        		}
-	        	} else if(!(value instanceof Long || value instanceof Integer || value instanceof Boolean || value instanceof Enum)){
+	        	} else if(!(value instanceof Long || value instanceof Integer || value instanceof Boolean || value instanceof Enum || value instanceof Date)){
 	        		criterias.add(field.getName() + " like " + "'%" + value + "%'");
 	        	} else if(value instanceof Enum){
 	        		criterias.add(field.getName() + "=" + "'" + ((Enum<?>)value).ordinal() + "'");

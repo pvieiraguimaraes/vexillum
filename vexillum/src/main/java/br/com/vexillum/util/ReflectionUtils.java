@@ -154,7 +154,7 @@ public class ReflectionUtils {
 			if (field.isAnnotationPresent(SearchField.class)) {
 				SearchField annotation = field.getAnnotation(SearchField.class);
 				field.setAccessible(true);
-				if(annotation.introspect() && instropect){
+				if(annotation.introspect() && instropect && field.get(entity)!=null){
 					resultList.putAll(getSearchFieldsAndValues((ICommonEntity) field.get(entity),instropect));
 				} else {
 					resultList.put(field, field.get(entity));
