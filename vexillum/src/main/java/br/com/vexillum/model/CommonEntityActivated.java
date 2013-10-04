@@ -3,6 +3,8 @@ package br.com.vexillum.model;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
+import br.com.vexillum.model.annotations.SearchField;
+
 @SuppressWarnings({ "serial" })
 @MappedSuperclass
 public class CommonEntityActivated extends CommonEntity implements IActivatedEntity {
@@ -11,6 +13,7 @@ public class CommonEntityActivated extends CommonEntity implements IActivatedEnt
 		this.active = true;
 	}
 	
+	@SearchField
 	@Column(name = "active", nullable = false)
 	private Boolean active;
 	
