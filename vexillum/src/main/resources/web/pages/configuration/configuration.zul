@@ -1,8 +1,8 @@
 <zk>
 	<hbox apply="${pageConfigurationComposer}">
-		<vbox>
+		<vbox if="br.com.vexillum.view.isAdministrator()">
 			<hbox width="100%" align="center" pack="center">
-				<label value="Categorias:"/>
+				<label value="Categorias:x"/>
 				<combobox id="comboCatUser" width="150px" model="@{controller.userPropertiesCategory}" 
 				selectedItem="@{controller.selectedUserCategory}" 
 				sclass="comboPageProperties"
@@ -30,7 +30,7 @@
 		
 		<separator width="30px"/>
 			
-		<vbox if="br.com.vexillum.view.isAdministrator()">
+		<vbox >
 			<hbox width="100%" align="center" pack="center">
 				<label value="Categorias:"/>
 				<combobox id="comboCatSystem" width="150px" model="@{controller.systemPropertiesCategory}" 
