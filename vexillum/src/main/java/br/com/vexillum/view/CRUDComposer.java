@@ -1,10 +1,12 @@
 package br.com.vexillum.view;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zk.ui.Component;
@@ -13,6 +15,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
@@ -314,6 +317,15 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 		
 		FriendshipController controller = SpringFactory.getController("friendshipController", FriendshipController.class, data);
 		return controller.doAction("save");
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected List<?> getSelectedItemsValues(Set<Listitem> selectedItems){
+		List values = new ArrayList();
+		for(Listitem item : selectedItems){
+			values.add(item.getValue());
+		}
+		return values;
 	}
 
 	/**
