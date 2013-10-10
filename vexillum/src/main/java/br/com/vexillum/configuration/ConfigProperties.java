@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
  *Classe respon�vel pelo properties de Configura��es
  */
 @Deprecated
-public class ConfigProperties extends Properties {	
+public class ConfigProperties extends Properties {	 
 	
 	/**
 	 * Iniciando os properties passando o caminho dos properties de configura��o.
