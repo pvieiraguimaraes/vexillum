@@ -20,9 +20,7 @@ import br.com.vexillum.util.SpringFactory;
 @Scope("prototype")
 public class FilteredSearchComposer extends CRUDComposer {
 
-	private ICommonEntity bindInEntity;
-	
-	private String bindInVariable;
+	private String bindIn;
 	
 	private String controllerClass;
 	
@@ -30,20 +28,12 @@ public class FilteredSearchComposer extends CRUDComposer {
 	
 	private String criterias;
 	
-	public ICommonEntity getBindInEntity() {
-		return bindInEntity;
+	public String getBindIn() {
+		return bindIn;
 	}
 
-	public void setBindInEntity(ICommonEntity bindInEntity) {
-		this.bindInEntity = bindInEntity;
-	}
-
-	public String getBindInVariable() {
-		return bindInVariable;
-	}
-
-	public void setBindInVariable(String bindInVariable) {
-		this.bindInVariable = bindInVariable;
+	public void setBindIn(String bindIn) {
+		this.bindIn = bindIn;
 	}
 
 	public String getControllerClass() {
@@ -92,9 +82,9 @@ public class FilteredSearchComposer extends CRUDComposer {
 	}
 	
 	public void initFilteredBinder(){
-		binder.bindBean("entity", getBindInEntity());
-		binder.addBinding(component, "selectedItem", "entity." + getBindInVariable());
-		binder.addBinding(component, "value", "entity." + getBindInVariable(), new String[]{"self.onChange"}, "none", "load", null);
+		binder.bindBean("entity", getEntity());
+		binder.addBinding(component, "selectedItem", "entity." + getBindIn());
+		binder.addBinding(component, "value", "entity." + getBindIn(), new String[]{"self.onChange"}, "none", "load", null);
 		loadBinder();
 	}
 

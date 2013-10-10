@@ -18,9 +18,7 @@ public class FilteredSearch extends HtmlMacroComponent {
 	
 	private ICommonEntity targetEntity;
 	
-	private ICommonEntity bindInEntity;
-	
-	private String bindInVariable;
+	private String bindIn;
 	
 	private String controller;
 	
@@ -37,22 +35,12 @@ public class FilteredSearch extends HtmlMacroComponent {
 		initBinder();
 	}
 	
-	public ICommonEntity getBindInEntity() {
-		return bindInEntity;
+	public String getBindIn() {
+		return bindIn;
 	}
 
-	public void setBindInEntity(ICommonEntity bindInEntity) {
-		this.bindInEntity = bindInEntity;
-		initBinder();
-	}
-
-	public String getBindInVariable() {
-		return bindInVariable;
-	}
-
-	public void setBindInVariable(String bindInVariable) {
-		this.bindInVariable = bindInVariable;
-		initBinder();
+	public void setBindIn(String bindIn) {
+		this.bindIn = bindIn;
 	}
 
 	public String getController() {
@@ -84,11 +72,10 @@ public class FilteredSearch extends HtmlMacroComponent {
 
 	@SuppressWarnings({ "unchecked" })
 	private void initBinder() {
-		if(getTargetEntity() != null && getBindInEntity() != null && getBindInVariable() != null){
+		if(getTargetEntity() != null && getBindIn() != null){
 			FilteredSearchComposer composer = getComposer();
 			composer.setEntity(targetEntity);
-			composer.setBindInEntity(bindInEntity);
-			composer.setBindInVariable(bindInVariable);
+			composer.setBindIn(bindIn);
 			composer.initFilteredBinder();
 		}
 	}
