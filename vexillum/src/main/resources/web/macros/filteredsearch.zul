@@ -1,0 +1,7 @@
+<zk>
+	<combobox id="cmbFilteredSearch" sclass="filteredSearch" hflex="1" autodrop="true" buttonVisible="false" apply="${filteredSearchComposer}">
+		<attribute name="onChanging">
+			controller.refreshList(self, event.getValue());
+		</attribute>
+	</combobox>
+</zk>
