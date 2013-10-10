@@ -73,7 +73,7 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		persistence  = SpringFactory.getInstance().getBean("genericPersistence", GenericPersistence.class);
 		thisClass = this.getClass();
 //		this.classEntity = ReflectionUtils.getGenericType(this);
-		this.classEntity = classEntity;
+		this.classEntity = (Class<E>) (classEntity == null ? Object.class : classEntity);
 		try {
 			messages =  SpringFactory.getInstance().getBean("messagesProperties", Properties.class);
 		} catch (Exception e) {
