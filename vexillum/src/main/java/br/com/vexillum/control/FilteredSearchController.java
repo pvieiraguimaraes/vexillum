@@ -1,11 +1,13 @@
 package br.com.vexillum.control;
 
+import java.lang.reflect.Field;
 import java.util.StringTokenizer;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import br.com.vexillum.model.interfaces.IFilteredSearch;
+import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.Return;
 
 @SuppressWarnings("rawtypes")
@@ -26,16 +28,16 @@ public class FilteredSearchController extends GenericControl implements IFiltere
 		
 		StringTokenizer token;
 		
-		String sql = "FROM " + getEntity().getClass().getSimpleName() + " "
+		String sql = "FROM " + getBindInClass().getSimpleName() + " "
 				+ "WHERE "; 
 		
 		if(criterias != null){
 			token = new StringTokenizer(criterias, ",");
 			while(token.hasMoreElements()){
 				String criteria = token.nextToken();
-				sql += criteria + " like '%" + searchKey + "%', ";
+				sql += criteria + " like '%" + searchKey + "%' OR ";
 			}
-			sql = sql.substring(0, sql.lastIndexOf(","));
+			sql = sql.substring(0, sql.lastIndexOf(" OR"));
 		} else {
 			sql += "name like '%" + searchKey + "%'";
 		}
@@ -45,4 +47,20 @@ public class FilteredSearchController extends GenericControl implements IFiltere
 		return searchByHQL();
 	}
 	
+	private Class getBindInClass(){
+		String bindIn = (String) data.get("bindIn");
+		Class targetClass = null;
+		
+		for(Field f : ReflectionUtils.getFields(getEntity().getClass())){
+			if(f.getName().equals(bindIn)){
+				targetClass = f.getType();
+			}
+		}
+		
+		if(targetClass == null){
+			throw new IllegalArgumentException("BindIn não encontrado no target entity! Possivelmente o nome está incorreto!");
+		}
+		
+		return targetClass;
+	}
 }
