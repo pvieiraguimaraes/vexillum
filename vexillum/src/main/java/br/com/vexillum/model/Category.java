@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 @Entity
 public class Category extends EntityBasic implements GrantedAuthority {
 
-	public Category() {
+	public Category() { 
 		super();
 	}
 	
