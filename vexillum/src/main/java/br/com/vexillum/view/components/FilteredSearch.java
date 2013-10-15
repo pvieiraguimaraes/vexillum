@@ -1,6 +1,7 @@
 package br.com.vexillum.view.components;
 
 import org.zkoss.zk.ui.HtmlMacroComponent;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Combobox;
@@ -86,6 +87,7 @@ public class FilteredSearch extends HtmlMacroComponent {
 
 	public FilteredSearch() {
 		super.compose();
+		cmbFilteredSearch.addForward(Events.ON_CHANGE, this, Events.ON_CHANGE);
 	}
 	
 }
