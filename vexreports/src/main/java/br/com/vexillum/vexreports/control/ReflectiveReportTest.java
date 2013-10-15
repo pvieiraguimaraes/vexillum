@@ -37,13 +37,12 @@ public class ReflectiveReportTest {
 	 * also add 3 groups
 	 */
 	public void testOrderedReport() {
-		final Collection data = TestRepositoryProducts.getDummyCollection();
+		final Collection data = TestRepositoryProducts.getDummyCollectionSmall();
 		final List items = SortUtils.sortCollection(data,
-				Arrays.asList(new String[] { "productLine", "item", "state" }));
-		String[] columOrders = new String[] { "productLine", "item", "state",
-				"id", "branch", "quantity", "amount" };
+				Arrays.asList(new String[] { "productLine", "item"}));
+		String[] columOrders = new String[] { "productLine", "item"};
 		DynamicReport dynamicReport = new ReflectiveReportBuilder(items,
-				columOrders).addGroups(3).build();
+				columOrders).addGroups(2).build();
 		doReport(dynamicReport, items, "ordered");
 	}
 
@@ -54,11 +53,11 @@ public class ReflectiveReportTest {
 					.generateJasperPrint(_report, new ClassicLayoutManager(),
 							_data);
 			JasperViewer.viewReport(jasperPrint);
-			ReportExporter.exportReport(jasperPrint,
-					System.getProperty("user.dir")
-							+ "/target/ReflectiveReportTest " + name + ".pdf");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+//			ReportExporter.exportReport(jasperPrint,
+//					System.getProperty("user.dir")
+//							+ "/target/ReflectiveReportTest " + name + ".pdf");
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
 		} catch (JRException e) {
 			e.printStackTrace();
 		}
@@ -66,7 +65,7 @@ public class ReflectiveReportTest {
 
 	public static void main(final String[] _args) {
 		final ReflectiveReportTest reportTest = new ReflectiveReportTest();
-		reportTest.testReport();
+//		reportTest.testReport();
 		reportTest.testOrderedReport();
 	}
 }
