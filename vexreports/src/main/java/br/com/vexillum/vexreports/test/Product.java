@@ -1,4 +1,4 @@
-package br.com.vexillum.vexreports.model;
+package br.com.vexillum.vexreports.test;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
