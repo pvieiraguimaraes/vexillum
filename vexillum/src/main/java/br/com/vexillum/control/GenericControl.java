@@ -3,8 +3,6 @@ package br.com.vexillum.control;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
-
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.control.persistence.GenericPersistence;
