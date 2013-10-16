@@ -1,4 +1,4 @@
-package br.com.vexillum.vexreports.model;
+package br.com.vexillum.vexreports.test;
 
 public class State {
 

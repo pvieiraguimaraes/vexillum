@@ -12,13 +12,14 @@ import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.Return;
 import br.com.vexillum.util.SpringFactory;
-import br.com.vexillum.vexreports.control.ReportsControl;
+import br.com.vexillum.vexreports.control.GenericGeneratorReporter;
 import br.com.vexillum.view.CRUDComposer;
 
 @SuppressWarnings({ "rawtypes", "serial" })
 @org.springframework.stereotype.Component
 @Scope("prototype")
-public class ReportsComposer<E extends CommonEntity> extends CRUDComposer {
+public abstract class ReportsComposer<E extends CommonEntity, G extends GenericGeneratorReporter>
+		extends CRUDComposer {
 
 	private List<E> listReport;
 
@@ -57,13 +58,15 @@ public class ReportsComposer<E extends CommonEntity> extends CRUDComposer {
 	}
 
 	@Override
-	public GenericControl getControl() {
-		ReportsControl controller;
-		controller = SpringFactory.getController("reportsControl",
-				ReportsControl.class,
+	public GenericGeneratorReporter getControl() {
+		GenericGeneratorReporter controller;
+		controller = SpringFactory.getController("genericGeneratorReporter",
+				GenericGeneratorReporter.class,
 				ReflectionUtils.prepareDataForPersistence(this));
 		return controller;
 	}
+
+	public abstract G getGenerator();
 
 	@Override
 	public ICommonEntity getEntityObject() {
@@ -88,7 +91,10 @@ public class ReportsComposer<E extends CommonEntity> extends CRUDComposer {
 			String msg = "A lista do parâmetro ou o listEntity não podem ser nulos";
 			throw new InvalidParameterException(msg);
 		}
-		ret.concat(getControl().doAction("generateReport"));
+		GenericControl controller = getGenerator(); //Tenta buscar um gerador especifico
+		if(controller == null)
+			controller = getControl();				//Caso não encontre usa o Generico
+		ret.concat(controller.doAction("generateReport"));
 		return ret;
 	}
 
