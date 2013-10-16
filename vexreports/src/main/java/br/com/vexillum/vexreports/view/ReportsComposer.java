@@ -71,7 +71,7 @@ public class ReportsComposer<E extends ICommonEntity, G extends GenericControl<E
 		if (thisListEntity != null || !thisListEntity.isEmpty())
 			listReport = thisListEntity;
 		else if (list != null || !list.isEmpty())
-			listEntity = list;
+			listReport = list;
 		else if (thisListEntity == null && list == null) {
 			ret.setValid(false);
 			String msg = "A lista do parâmetro ou o listEntity não podem ser nulos";
