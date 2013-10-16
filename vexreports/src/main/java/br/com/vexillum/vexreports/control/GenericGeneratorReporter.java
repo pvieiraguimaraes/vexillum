@@ -1,50 +1,87 @@
 package br.com.vexillum.vexreports.control;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-import ar.com.fdvs.dj.domain.DJCalculation;
-import ar.com.fdvs.dj.domain.DJValueFormatter;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
+import ar.com.fdvs.dj.core.DynamicJasperHelper;
+import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
 import ar.com.fdvs.dj.domain.DynamicReport;
-import ar.com.fdvs.dj.domain.builders.DynamicReportBuilder;
+import ar.com.fdvs.dj.util.SortUtils;
+import br.com.vexillum.control.GenericControl;
+import br.com.vexillum.model.CommonEntity;
+import br.com.vexillum.model.ICommonEntity;
+import br.com.vexillum.util.Return;
 
-public class GenericGeneratorReporter {
-	
-	private DynamicReportBuilder drb;
-	
+@SuppressWarnings("rawtypes")
+public abstract class GenericGeneratorReporter extends GenericControl<ICommonEntity> {
+
+	private List listReport;
+	private String[] listItens;
+	private String[] orderItens;
+
 	public GenericGeneratorReporter() {
-		drb = new DynamicReportBuilder();
-	}
-	
-	public DynamicReport buildReport() throws Exception {
-//		drb.addColumn("State", "state", String.class.getName(),30)
-//			.addColumn("Branch", "branch", String.class.getName(),30)
-//			.addColumn("Product Line", "productLine", String.class.getName(),50)
-//			.addColumn("Item", "item", String.class.getName(),50)
-//			.addColumn("Item Code", "id", Long.class.getName(),30,true)
-//			.addColumn("Quantity", "quantity", Long.class.getName(),60,true)
-//			.addColumn("Amount", "amount", Float.class.getName(),70,true)
-//			.addGroups(2)
-//			.setTitle("November \"2006\" sales report")
-//			.setSubtitle("This report was generated at " + new Date())
-//			.setPrintBackgroundOnOddRows(true)			
-//			.setUseFullPageWidth(true);
-
-	    drb.addGlobalFooterVariable(drb.getColumn(4), DJCalculation.COUNT, null, new DJValueFormatter() {
-
-	        public String getClassName() {
-	            return String.class.getName();
-	        }
-
-
-	        public Object evaluate(Object value, Map fields, Map variables,   Map parameters) {
-	            return (value == null ? "0" : value.toString()) + " Clients";
-	        }
-	    });
-
-
-		DynamicReport dr = drb.build();
-
-		return dr;
+		super(null);
+		initReport();
 	}
 
+	@SuppressWarnings("unchecked")
+	private void initReport() {
+		listReport = (List<CommonEntity>) data.get("listReport");
+		listItens = (String[]) data.get("listItens");
+		orderItens = (String[]) data.get("orderItens");
+	}
+
+	public void doReport(Collection data) {
+		try {
+			DynamicReport report = buildReport(listReport, listItens,
+					orderItens);
+			String templateFileName = getTemplateReport();
+			if (templateFileName != null)
+				report.setTemplateFileName(templateFileName);
+			final JasperPrint jasperPrint = DynamicJasperHelper
+					.generateJasperPrint(report, new ClassicLayoutManager(),
+							data);
+			JasperViewer.viewReport(jasperPrint);
+			// ReportExporter.exportReport(jasperPrint,
+			// System.getProperty("user.dir")
+			// + "/target/ReflectiveReportTest " + name + ".pdf");
+			// TODO Serve para exportar o relatório em um ficheiro.
+		} catch (JRException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Metodo que seta o template jrxml padrão para gerar os relatórios do
+	 * projeto se houver
+	 * 
+	 * @return
+	 */
+	protected abstract String getTemplateReport();
+
+	/**
+	 * Deverá ser implementado para gerar o relatorio para cada projeto
+	 * 
+	 * @param orderItens
+	 * @param listItens
+	 * @param listReport
+	 * 
+	 * @return
+	 */
+	protected abstract DynamicReport buildReport(List listReport,
+			String[] listItens, String[] orderItens);
+
+	public Return generateReport() {
+		Return ret = new Return(true);
+
+		List items = SortUtils.sortCollection(listReport,
+				Arrays.asList(listItens));
+
+		doReport(items);
+		return ret;
+	}
 }
