@@ -7,19 +7,16 @@ import org.springframework.context.annotation.Scope;
 import org.zkoss.zk.ui.Component;
 
 import br.com.vexillum.control.GenericControl;
-import br.com.vexillum.model.CommonEntity;
 import br.com.vexillum.model.ICommonEntity;
-import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.Return;
-import br.com.vexillum.util.SpringFactory;
 import br.com.vexillum.vexreports.control.GenericGeneratorReporter;
 import br.com.vexillum.view.CRUDComposer;
 
 @SuppressWarnings({ "rawtypes", "serial" })
 @org.springframework.stereotype.Component
 @Scope("prototype")
-public abstract class ReportsComposer<E extends CommonEntity, G extends GenericGeneratorReporter>
-		extends CRUDComposer {
+public class ReportsComposer<E extends ICommonEntity, G extends GenericControl<E>>
+		extends CRUDComposer<E, G> {
 
 	private List<E> listReport;
 
@@ -57,19 +54,7 @@ public abstract class ReportsComposer<E extends CommonEntity, G extends GenericG
 		loadBinder();
 	}
 
-	@Override
-	public GenericGeneratorReporter getControl() {
-		GenericGeneratorReporter controller;
-		controller = SpringFactory.getController("genericGeneratorReporter",
-				GenericGeneratorReporter.class,
-				ReflectionUtils.prepareDataForPersistence(this));
-		return controller;
-	}
-
-	public abstract G getGenerator();
-
-	@Override
-	public ICommonEntity getEntityObject() {
+	public GenericGeneratorReporter getGenerator(){
 		return null;
 	}
 
@@ -82,20 +67,30 @@ public abstract class ReportsComposer<E extends CommonEntity, G extends GenericG
 	@SuppressWarnings({ "unchecked", "null", "unused" })
 	public Return generateReport(List list) {
 		Return ret = new Return(true);
-		if (getListEntity() != null || !getListEntity().isEmpty())
-			listReport = getListEntity();
+		List thisListEntity = getListEntity();
+		if (thisListEntity != null || !thisListEntity.isEmpty())
+			listReport = thisListEntity;
 		else if (list != null || !list.isEmpty())
 			listEntity = list;
-		else if (getListEntity() == null && list == null) {
+		else if (thisListEntity == null && list == null) {
 			ret.setValid(false);
 			String msg = "A lista do parâmetro ou o listEntity não podem ser nulos";
 			throw new InvalidParameterException(msg);
 		}
-		GenericControl controller = getGenerator(); //Tenta buscar um gerador especifico
-		if(controller == null)
-			controller = getControl();				//Caso não encontre usa o Generico
+		
+		GenericControl controller = getGenerator(); // Tenta buscar um gerador
 		ret.concat(controller.doAction("generateReport"));
 		return ret;
+	}
+
+	@Override
+	public G getControl() {
+		return null;
+	}
+
+	@Override
+	public E getEntityObject() {
+		return null;
 	}
 
 }

@@ -25,7 +25,7 @@ public abstract class GenericGeneratorReporter extends GenericControl<ICommonEnt
 
 	public GenericGeneratorReporter() {
 		super(null);
-		initReport();
+//		initReport();
 	}
 
 	@SuppressWarnings("unchecked")
