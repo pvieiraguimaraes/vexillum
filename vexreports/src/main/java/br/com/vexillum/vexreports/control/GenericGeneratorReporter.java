@@ -25,14 +25,14 @@ public abstract class GenericGeneratorReporter extends GenericControl<ICommonEnt
 
 	public GenericGeneratorReporter() {
 		super(null);
-//		initReport();
+		initReport();
 	}
 
 	@SuppressWarnings("unchecked")
 	private void initReport() {
 		listReport = (List<CommonEntity>) data.get("listReport");
-		listItens = (String[]) data.get("listItens");
-		orderItens = (String[]) data.get("orderItens");
+//		listItens = (String[]) data.get("listItens");
+//		orderItens = (String[]) data.get("orderItens");
 	}
 
 	public void doReport(Collection data) {
