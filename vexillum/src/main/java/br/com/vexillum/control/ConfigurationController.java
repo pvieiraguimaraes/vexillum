@@ -10,6 +10,7 @@ import br.com.vexillum.model.Configuration;
 public class ConfigurationController extends GenericControl<Configuration> {
 
 	public ConfigurationController() {
+		
 		super(Configuration.class);
 	}
 
