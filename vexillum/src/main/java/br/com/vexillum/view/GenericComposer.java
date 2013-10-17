@@ -84,6 +84,14 @@ public class GenericComposer<U extends UserBasic> extends
 	public void loadBinder() {
 		binder.loadAll();
 	}
+	
+	public void loadComponent(Component component){
+		binder.loadComponent(component);
+	}
+	
+	public void loadComponent(String component){
+		binder.loadComponent(getComponentById(component));
+	}
 
 	public boolean doAction(String action) {
 		Return ret = null;
