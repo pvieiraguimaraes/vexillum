@@ -15,7 +15,7 @@ import br.com.vexillum.view.CRUDComposer;
 @SuppressWarnings({ "rawtypes", "serial" })
 @org.springframework.stereotype.Component
 @Scope("prototype")
-public class ReportsComposer<E extends ICommonEntity, G extends GenericControl<E>>
+public abstract class ReportsComposer<E extends ICommonEntity, G extends GenericControl<E>>
 		extends CRUDComposer<E, G> {
 
 	private List<E> listReport;
@@ -91,16 +91,6 @@ public class ReportsComposer<E extends ICommonEntity, G extends GenericControl<E
 		GenericControl controller = getGenerator(); // Tenta buscar um gerador
 		ret.concat(controller.doAction("generateReport"));
 		return ret;
-	}
-
-	@Override
-	public G getControl() {
-		return null;
-	}
-
-	@Override
-	public E getEntityObject() {
-		return null;
 	}
 
 }
