@@ -23,6 +23,16 @@ public class ReportsComposer<E extends ICommonEntity, G extends GenericControl<E
 	private String[] listItens;
 
 	private String[] orderItens;
+	
+	private boolean withTemplate;
+	
+	public boolean getWithTemplate() {
+		return withTemplate;
+	}
+
+	public void setWithTemplate(boolean withTemplate) {
+		this.withTemplate = withTemplate;
+	}
 
 	public String[] getListItens() {
 		return listItens;
