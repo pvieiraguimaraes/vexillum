@@ -1,16 +1,14 @@
 package br.com.vexillum.vexreports.control;
 
-import java.util.Arrays;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.view.JasperViewer;
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
 import ar.com.fdvs.dj.domain.DynamicReport;
-import ar.com.fdvs.dj.util.SortUtils;
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.model.CommonEntity;
 import br.com.vexillum.model.ICommonEntity;
@@ -22,15 +20,16 @@ public abstract class GenericGeneratorReporter extends GenericControl<ICommonEnt
 	private List listReport;
 	private String[] listItens;
 	private String[] orderItens;
+	private boolean withTemplate = false;
 
 	public GenericGeneratorReporter() {
 		super(null);
-		initReport();
 	}
 
 	@SuppressWarnings("unchecked")
 	private void initReport() {
 		listReport = (List<CommonEntity>) data.get("listReport");
+		withTemplate = (Boolean) data.get("withTemplate");
 //		listItens = (String[]) data.get("listItens");
 //		orderItens = (String[]) data.get("orderItens");
 	}
@@ -39,18 +38,18 @@ public abstract class GenericGeneratorReporter extends GenericControl<ICommonEnt
 		try {
 			DynamicReport report = buildReport(listReport, listItens,
 					orderItens);
-			String templateFileName = getTemplateReport();
-			if (templateFileName != null)
-				report.setTemplateFileName(templateFileName);
-			final JasperPrint jasperPrint = DynamicJasperHelper
+			DynamicReport reportTemplate = getTemplateReport();
+			if(withTemplate && reportTemplate != null)
+				report = getTemplateReport();
+			JasperPrint jasperPrint = DynamicJasperHelper
 					.generateJasperPrint(report, new ClassicLayoutManager(),
 							data);
-			JasperViewer.viewReport(jasperPrint);
-			// ReportExporter.exportReport(jasperPrint,
-			// System.getProperty("user.dir")
-			// + "/target/ReflectiveReportTest " + name + ".pdf");
+//			JasperViewer.viewReport(jasperPrint);
+			 ReportExporter.exportReport(jasperPrint,"D:/Reports TESTE/ReflectiveReportTest.pdf");
 			// TODO Serve para exportar o relatório em um ficheiro.
 		} catch (JRException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -61,7 +60,7 @@ public abstract class GenericGeneratorReporter extends GenericControl<ICommonEnt
 	 * 
 	 * @return
 	 */
-	protected abstract String getTemplateReport();
+	protected abstract DynamicReport getTemplateReport();
 
 	/**
 	 * Deverá ser implementado para gerar o relatorio para cada projeto
@@ -77,11 +76,11 @@ public abstract class GenericGeneratorReporter extends GenericControl<ICommonEnt
 
 	public Return generateReport() {
 		Return ret = new Return(true);
+		initReport();
+//		List items = SortUtils.sortCollection(listReport,
+//				Arrays.asList(listItens));
 
-		List items = SortUtils.sortCollection(listReport,
-				Arrays.asList(listItens));
-
-		doReport(items);
+		doReport(listReport);
 		return ret;
 	}
 }
