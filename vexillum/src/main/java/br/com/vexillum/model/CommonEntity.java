@@ -9,6 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import br.com.vexillum.model.annotations.SearchField;
 import br.com.vexillum.util.CloneUtils;
+import br.com.vexillum.util.HibernateUtils;
 
 /**
  * @author Pedro Henrique, Entidade master todas as classes
@@ -48,6 +49,7 @@ public abstract class CommonEntity implements ICommonEntity {
 	
 	@Override
 	public boolean equals(Object obj){
+		obj = HibernateUtils.materializeProxy(obj);
 		if(this == obj)
 			return true;
 		if(obj == null)
