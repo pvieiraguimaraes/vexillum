@@ -16,39 +16,44 @@ import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
 import ar.com.fdvs.dj.domain.DynamicReport;
 import ar.com.fdvs.dj.domain.builders.ColumnBuilder;
+import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
 import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
+import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.CommonEntity;
 import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.Return;
+import br.com.vexillum.util.SpringFactory;
 import br.com.vexillum.vexreports.annotation.ReportField;
 
 @SuppressWarnings("rawtypes")
 public abstract class GenericGeneratorReporter extends
 		GenericControl<ICommonEntity> {
+	
+	protected Properties reportConfig;
 
 	/**
 	 * Lista da qual será gerada o relatório
 	 */
-	private List listReport;
+	protected List listReport;
 
 	/**
 	 * Lista de itens que deverão aparecer no relatório, caso não queira seguir
 	 * os valores anotados pela anotação {@link ReportField}
 	 */
-	private String[] listItens;
+	protected String[] listItens;
 
 	/**
 	 * True, Caso queira adicionar um template ao relatório
 	 */
-	private boolean withTemplate = false;
+	protected boolean withTemplate = false;
 
 	/**
 	 * Se True estabelece que utilizará os valores anotados {@link ReportField}
 	 */
-	private boolean followAnnotation = true;
+	protected boolean followAnnotation = true;
 
 	/**
 	 * Caso queira definir nomes diferentes dos anotados pela anotação
@@ -56,10 +61,15 @@ public abstract class GenericGeneratorReporter extends
 	 * o nome do campo como é na classe e o valor desejado. Ex. active =
 	 * "Ativado"
 	 */
-	private Map<String, String> mapFieldsName;
+	protected Map<String, String> mapFieldsName;
 
 	public GenericGeneratorReporter() {
 		super(null);
+		try {
+			reportConfig =  SpringFactory.getInstance().getBean("reportConfiguration", Properties.class);
+		} catch (Exception e) {
+			reportConfig = null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -67,11 +77,8 @@ public abstract class GenericGeneratorReporter extends
 		listReport = (List<CommonEntity>) data.get("listReport");
 		withTemplate = (Boolean) data.get("withTemplate");
 
-		// True se for seguir as anotações
 		followAnnotation = (Boolean) data.get("followAnnotation");
 
-		// Se seguir a anotação será preenchidos em execução se não seguir
-		// deverão ser preenchidos anteriormente
 		listItens = (String[]) data.get("listItens");
 		mapFieldsName = (Map<String, String>) data.get("mapFieldsName");
 		initEntities();
@@ -87,29 +94,32 @@ public abstract class GenericGeneratorReporter extends
 			mapFieldsName = new HashMap();
 	}
 
-	public void doReport() {
+	public Return doReport() {
+		Return ret = new Return(true);
 		try {
 			generateDataReport(); // Gera valores nas listas de dados..
-			DynamicReport report = buildReport(listReport, listItens,
-					mapFieldsName);
-			DynamicReport reportTemplate = getTemplateReport();
-			if (withTemplate && reportTemplate != null)
-				report = getTemplateReport();
+			DynamicReport report = buildReport();
+			
 			JasperPrint jasperPrint = DynamicJasperHelper.generateJasperPrint(
 					report, new ClassicLayoutManager(), listReport);
 			// JasperViewer.viewReport(jasperPrint);
 			ReportExporter.exportReport(jasperPrint,
 					"D:/Reports TESTE/ReflectiveReportTest.pdf");
 			// TODO Serve para exportar o relatório em um ficheiro.
+			return ret;
 		} catch (JRException e) {
+			ret.setValid(false);
 			new ExceptionManager(e).treatException();
 		} catch (FileNotFoundException e) {
+			ret.setValid(false);
 			new ExceptionManager(e).treatException();
 		} catch (NullPointerException e) {
+			ret.setValid(false);
 			e = new NullPointerException(
 					"As lista do relatório não pode ser nulla, listReport");
 			new ExceptionManager(e).treatException();
 		}
+		return ret;
 	}
 
 	/**
@@ -118,10 +128,10 @@ public abstract class GenericGeneratorReporter extends
 	private void generateDataReport() throws NullPointerException {
 		if (followAnnotation)
 			readAnnotatedFields();
-
 	}
 
 	private void readAnnotatedFields() {
+		List<String> resultListItens = new ArrayList<>();
 		if (!listReport.isEmpty()) {
 			ICommonEntity entity = (ICommonEntity) listReport.get(0);
 			List<Field> fields = ReflectionUtils.getAnnotatedFields(entity,
@@ -131,13 +141,21 @@ public abstract class GenericGeneratorReporter extends
 				if (annotation.name() != "")
 					mapFieldsName.put(field.getName(), annotation.name());
 				if (annotation.order() != 0)
-					listItens = ArrayUtils.add(listItens, annotation.order(),
-							field.getName());
+					resultListItens.add(annotation.order() - 1, field.getName());
 				else
-					listItens = ArrayUtils.add(listItens, field.getName());
+					resultListItens.add(field.getName());
 
 			}
+			listItens = convertListInArray(resultListItens);
 		}
+	}
+
+	private String[] convertListInArray(List<String> resultListItens) {
+		String[] array = new String[]{};
+		for (String string : resultListItens) {
+			array = ArrayUtils.add(array, string);
+		}
+		return array;
 	}
 
 	public AbstractColumn createAbstractColumn(String itemName,
@@ -177,7 +195,7 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected abstract DynamicReport getTemplateReport();
+	protected abstract FastReportBuilder getTemplateReport(FastReportBuilder reportBuilder);
 
 	/**
 	 * Deverá ser implementado para gerar o relatorio para cada projeto
@@ -188,8 +206,7 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected abstract DynamicReport buildReport(List listReport,
-			String[] listItens, Map<String, String> mapField);
+	protected abstract DynamicReport buildReport();
 
 	public Return generateReport() {
 		initReport(); // Não esquecer de chamar essse método antes de executar o
