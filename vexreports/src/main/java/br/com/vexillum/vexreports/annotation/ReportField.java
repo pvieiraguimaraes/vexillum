@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface ReportField {
 	int order() default 0;
+	String name() default "";
 }

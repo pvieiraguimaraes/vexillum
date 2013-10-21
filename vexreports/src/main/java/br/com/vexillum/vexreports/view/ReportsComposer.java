@@ -1,7 +1,7 @@
 package br.com.vexillum.vexreports.view;
 
-import java.security.InvalidParameterException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.annotation.Scope;
 import org.zkoss.zk.ui.Component;
@@ -22,10 +22,28 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 
 	private String[] listItens;
 
-	private String[] orderItens;
-	
 	private boolean withTemplate;
-	
+
+	private Map<String, String> mapFieldsName;
+
+	private boolean followAnnotation = true;
+
+	public Map<String, String> getMapFieldsName() {
+		return mapFieldsName;
+	}
+
+	public void setMapFieldsName(Map<String, String> mapFieldsName) {
+		this.mapFieldsName = mapFieldsName;
+	}
+
+	public boolean getFollowAnnotation() {
+		return followAnnotation;
+	}
+
+	public void setFollowAnnotation(boolean followAnnotation) {
+		this.followAnnotation = followAnnotation;
+	}
+
 	public boolean getWithTemplate() {
 		return withTemplate;
 	}
@@ -42,14 +60,6 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		this.listItens = listItens;
 	}
 
-	public String[] getOrderItens() {
-		return orderItens;
-	}
-
-	public void setOrderItens(String[] orderItens) {
-		this.orderItens = orderItens;
-	}
-
 	public List<E> getListReport() {
 		return listReport;
 	}
@@ -64,7 +74,12 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		loadBinder();
 	}
 
-	public GenericGeneratorReporter getGenerator(){
+	/**
+	 * Retorna a classe geradora do relatório.
+	 * 
+	 * @return
+	 */
+	public GenericGeneratorReporter getGeneratorReport() {
 		return null;
 	}
 
@@ -85,10 +100,11 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		else if (thisListEntity == null && list == null) {
 			ret.setValid(false);
 			String msg = "A lista do parâmetro ou o listEntity não podem ser nulos";
-			throw new InvalidParameterException(msg);
+			throw new NullPointerException(msg);
 		}
-		
-		GenericControl controller = getGenerator(); // Tenta buscar um gerador
+
+		GenericControl controller = getGeneratorReport(); // Tenta buscar um
+															// gerador
 		ret.concat(controller.doAction("generateReport"));
 		return ret;
 	}
