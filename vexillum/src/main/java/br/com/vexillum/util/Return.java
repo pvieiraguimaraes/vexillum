@@ -1,16 +1,23 @@
 package br.com.vexillum.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Return {
 	
-	boolean valid;
-	List<?> list;
-	ArrayList<Message> messages;
+	private Serializable serializable;
+	private boolean valid;
+	private List<?> list;
+	private ArrayList<Message> messages;
 	
 	public Return(boolean valid){
 		this.valid = valid;
+	}
+	
+	public Return(Serializable serializable){
+		this.serializable = serializable;
+		this.valid = true;
 	}
 	
 	public Return(boolean valid, Message message){
@@ -73,7 +80,17 @@ public class Return {
 		this.messages.add(message);
 	}
 
+	public Serializable getSerializable() {
+		return serializable;
+	}
+
+	public void setSerializable(Serializable serializable) {
+		this.serializable = serializable;
+	}
+
 	public void concat(Return ret) {
+		setSerializable(ret.getSerializable());
+		
 		setValid(isValid() && ret.isValid());
 		
 		if(getList() == null || getList().isEmpty()){

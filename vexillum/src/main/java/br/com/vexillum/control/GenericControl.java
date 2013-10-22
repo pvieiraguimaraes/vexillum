@@ -206,6 +206,10 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		return persistence.delete(entity);
 	}
 	
+	public E searchById(Long id){
+		return persistence.getById(id, classEntity);
+	}
+	
 	public Return deactivate(){
 		if(!(entity instanceof IActivatedEntity))
 			throw new IllegalArgumentException("Entidade Inválida. A mesma de ver herdar da interface IActivatedEntity!");

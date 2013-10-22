@@ -84,9 +84,8 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		Return ret = null;
 		try {
 //			beginTransaction();
-			getSession().save(getSession().merge(entity));
+			ret = new Return(getSession().save(getSession().merge(entity)));
 //			commitTransaction();
-			ret =  new Return(true);
 		} catch (Exception e) {
 //			rollbacktTransaction();
 			ret = new ExceptionManager(e).treatException();
@@ -286,6 +285,16 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 			ret = new ExceptionManager(e).treatException();
 		}
 		return ret;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public E getById(Long id, Class<?> classz){
+		try {
+			return (E) getSession().get(classz, id);
+		} catch (Exception e) {
+			new ExceptionManager(e).treatException();
+		}
+		return null;
 	}
 
 }
