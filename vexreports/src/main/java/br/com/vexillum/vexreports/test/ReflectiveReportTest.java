@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.jdt.internal.core.SetClasspathOperation;
+
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
@@ -57,8 +59,7 @@ public class ReflectiveReportTest {
 				columOrders).build();
 		
 		List<AbstractColumn> columns = createColluns();
-		dynamicReport.setColumns(columns);
-		
+		dynamicReport.setColumns(columns);		
 		
 		doReport(dynamicReport, items, "ordered");
 	}
