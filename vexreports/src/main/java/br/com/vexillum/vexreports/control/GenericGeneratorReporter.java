@@ -16,7 +16,7 @@ import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
 import ar.com.fdvs.dj.domain.DynamicReport;
 import ar.com.fdvs.dj.domain.builders.ColumnBuilder;
-import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
+import ar.com.fdvs.dj.domain.builders.DynamicReportBuilder;
 import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.GenericControl;
@@ -31,7 +31,13 @@ import br.com.vexillum.vexreports.annotation.ReportField;
 @SuppressWarnings("rawtypes")
 public abstract class GenericGeneratorReporter extends
 		GenericControl<ICommonEntity> {
-	
+
+	/**
+	 * Parâmetro utilizados para o setar variáveis no relatório seguindo o
+	 * padrão JasperReport
+	 */
+	protected Map params;
+
 	protected Properties reportConfig;
 
 	/**
@@ -66,7 +72,8 @@ public abstract class GenericGeneratorReporter extends
 	public GenericGeneratorReporter() {
 		super(null);
 		try {
-			reportConfig =  SpringFactory.getInstance().getBean("reportConfiguration", Properties.class);
+			reportConfig = SpringFactory.getInstance().getBean(
+					"reportConfiguration", Properties.class);
 		} catch (Exception e) {
 			reportConfig = null;
 		}
@@ -81,6 +88,9 @@ public abstract class GenericGeneratorReporter extends
 
 		listItens = (String[]) data.get("listItens");
 		mapFieldsName = (Map<String, String>) data.get("mapFieldsName");
+
+		params = (Map) data.get("params");
+
 		initEntities();
 	}
 
@@ -92,6 +102,8 @@ public abstract class GenericGeneratorReporter extends
 			listItens = new String[] {};
 		if (mapFieldsName == null)
 			mapFieldsName = new HashMap();
+		if (params == null)
+			params = new HashMap();
 	}
 
 	public Return doReport() {
@@ -99,9 +111,15 @@ public abstract class GenericGeneratorReporter extends
 		try {
 			generateDataReport(); // Gera valores nas listas de dados..
 			DynamicReport report = buildReport();
-			
-			JasperPrint jasperPrint = DynamicJasperHelper.generateJasperPrint(
-					report, new ClassicLayoutManager(), listReport);
+			JasperPrint jasperPrint = null;
+
+			if (!params.isEmpty())
+				jasperPrint = DynamicJasperHelper.generateJasperPrint(report,
+						new ClassicLayoutManager(), params);
+			else
+				jasperPrint = DynamicJasperHelper.generateJasperPrint(report,
+						new ClassicLayoutManager(), listReport);
+
 			// JasperViewer.viewReport(jasperPrint);
 			ReportExporter.exportReport(jasperPrint,
 					"D:/Reports TESTE/ReflectiveReportTest.pdf");
@@ -141,7 +159,8 @@ public abstract class GenericGeneratorReporter extends
 				if (annotation.name() != "")
 					mapFieldsName.put(field.getName(), annotation.name());
 				if (annotation.order() != 0)
-					resultListItens.add(annotation.order() - 1, field.getName());
+					resultListItens
+							.add(annotation.order() - 1, field.getName());
 				else
 					resultListItens.add(field.getName());
 
@@ -151,7 +170,7 @@ public abstract class GenericGeneratorReporter extends
 	}
 
 	private String[] convertListInArray(List<String> resultListItens) {
-		String[] array = new String[]{};
+		String[] array = new String[] {};
 		for (String string : resultListItens) {
 			array = ArrayUtils.add(array, string);
 		}
@@ -195,7 +214,8 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected abstract FastReportBuilder getTemplateReport(FastReportBuilder reportBuilder);
+	protected abstract DynamicReportBuilder getTemplateReport(
+			DynamicReportBuilder reportBuilder);
 
 	/**
 	 * Deverá ser implementado para gerar o relatorio para cada projeto
