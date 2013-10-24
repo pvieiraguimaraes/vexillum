@@ -53,6 +53,8 @@ public class DateCalc {
 	// Calcula a Idade baseado em java.util.Date
 
 	public static int calculateAge(java.util.Date birthDate) {
+		if(birthDate == null) return 0;
+		
 		Calendar dateOfBirth = new GregorianCalendar();
 		dateOfBirth.setTime(birthDate);
 
