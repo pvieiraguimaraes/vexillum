@@ -27,6 +27,18 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	private Map<String, String> mapFieldsName;
 
 	private boolean followAnnotation = true;
+	
+	private boolean concatenatedReports = false;
+	
+	private Map params;
+	
+	public boolean getConcatenatedReports() {
+		return concatenatedReports;
+	}
+
+	public void setConcatenatedReports(boolean concatenatedReports) {
+		this.concatenatedReports = concatenatedReports;
+	}
 
 	public Map<String, String> getMapFieldsName() {
 		return mapFieldsName;
@@ -68,6 +80,14 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		this.listReport = listReport;
 	}
 
+	public Map getParams() {
+		return params;
+	}
+
+	public void setParams(Map params) {
+		this.params = params;
+	}
+
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
@@ -89,15 +109,12 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		return ret;
 	}
 
-	@SuppressWarnings({ "unchecked", "null", "unused" })
+	@SuppressWarnings({ "unchecked", "null" })
 	public Return generateReport(List list) {
 		Return ret = new Return(true);
-		List thisListEntity = getListEntity();
-		if (thisListEntity != null || !thisListEntity.isEmpty())
-			listReport = thisListEntity;
-		else if (list != null || !list.isEmpty())
+		if (list != null || !list.isEmpty())
 			listReport = list;
-		else if (thisListEntity == null && list == null) {
+		else {
 			ret.setValid(false);
 			String msg = "A lista do parâmetro ou o listEntity não podem ser nulos";
 			throw new NullPointerException(msg);
