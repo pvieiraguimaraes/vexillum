@@ -271,8 +271,11 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 
 	@Override
 	public Return searchByNativeSQL(String sql) {
-		// TODO Criar pesqusia pela SQL nativa
-		return null;
+		Return ret = new Return(true);
+		
+		ret.setList(getSession().createSQLQuery(sql).list());
+		
+		return ret;
 	}
 
 	@Override
