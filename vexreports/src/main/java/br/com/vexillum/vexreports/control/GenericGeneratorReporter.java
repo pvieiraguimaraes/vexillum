@@ -7,15 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.column.ColumnBuilder;
+import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import ar.com.fdvs.dj.core.DynamicJasperHelper;
-import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
-import ar.com.fdvs.dj.domain.DynamicReport;
-import ar.com.fdvs.dj.domain.builders.ColumnBuilder;
 import ar.com.fdvs.dj.domain.builders.DynamicReportBuilder;
 import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
 import br.com.vexillum.configuration.Properties;
@@ -68,9 +68,12 @@ public abstract class GenericGeneratorReporter extends
 	 * "Ativado"
 	 */
 	protected Map<String, String> mapFieldsName;
+	
+	protected JasperReportBuilder report;
 
 	public GenericGeneratorReporter() {
 		super(null);
+		report = DynamicReports.report();
 		try {
 			reportConfig = SpringFactory.getInstance().getBean(
 					"reportConfiguration", Properties.class);
@@ -109,32 +112,35 @@ public abstract class GenericGeneratorReporter extends
 	public Return doReport() {
 		Return ret = new Return(true);
 		try {
-			generateDataReport(); // Gera valores nas listas de dados..
-			DynamicReport report = buildReport();
-			JasperPrint jasperPrint = null;
-
-			if (!params.isEmpty())
-				jasperPrint = DynamicJasperHelper.generateJasperPrint(report,
-						new ClassicLayoutManager(), params);
-			else
-				jasperPrint = DynamicJasperHelper.generateJasperPrint(report,
-						new ClassicLayoutManager(), listReport);
-
-			// JasperViewer.viewReport(jasperPrint);
-			ReportExporter.exportReport(jasperPrint,
-					"D:/Reports TESTE/ReflectiveReportTest.pdf");
-			// TODO Serve para exportar o relatório em um ficheiro.
-			return ret;
-		} catch (JRException e) {
-			ret.setValid(false);
-			new ExceptionManager(e).treatException();
-		} catch (FileNotFoundException e) {
-			ret.setValid(false);
-			new ExceptionManager(e).treatException();
+			generateDataReport();
+			
+			report = buildReport();
+			report.setDataSource(listReport);
+			
+			report.show();
+			
+//			JasperPrint jasperPrint = null;
+//			
+//			if (!params.isEmpty())
+//
+//			// JasperViewer.viewReport(jasperPrint);
+//			ReportExporter.exportReport(jasperPrint,
+//					"D:/Reports TESTE/ReflectiveReportTest.pdf");
+//			// TODO Serve para exportar o relatório em um ficheiro.
+//			return ret;
+//		} catch (JRException e) {
+//			ret.setValid(false);
+//			new ExceptionManager(e).treatException();
+//		} catch (FileNotFoundException e) {
+//			ret.setValid(false);
+//			new ExceptionManager(e).treatException();
 		} catch (NullPointerException e) {
 			ret.setValid(false);
 			e = new NullPointerException(
 					"As lista do relatório não pode ser nulla, listReport");
+			new ExceptionManager(e).treatException();
+		} catch (DRException e) {
+			ret.setValid(false);
 			new ExceptionManager(e).treatException();
 		}
 		return ret;
@@ -177,12 +183,26 @@ public abstract class GenericGeneratorReporter extends
 		return array;
 	}
 
-	public AbstractColumn createAbstractColumn(String itemName,
-			String nameCollum, Class valueClassName) {
-		AbstractColumn column = ColumnBuilder.getNew()
-				.setColumnProperty(itemName, valueClassName)
-				.setTitle(nameCollum).build();
-		return column;
+	@SuppressWarnings("unchecked")
+	public ColumnBuilder<?, ?> createColluns(String[] listItens,
+			Map<String, String> mapFields) {
+		
+//		ColumnBuilder<?, ?> builder = new ;
+		
+		List<AbstractColumn> cols = new ArrayList();
+
+		for (String item : listItens) {
+			String nameCollum = mapFields.get(item);
+			cols.add(createColumn(item, nameCollum, getClassField(item)));
+		}
+
+		return null;
+	}
+	
+	private AbstractColumn createColumn(String item, String nameCollum,
+			Class classField) {
+
+		return null;
 	}
 
 	private Class getClassField(String nameField) {
@@ -193,19 +213,6 @@ public abstract class GenericGeneratorReporter extends
 				return field.getType();
 		}
 		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<AbstractColumn> createColluns(String[] listItens,
-			Map<String, String> mapFields) {
-		List<AbstractColumn> cols = new ArrayList();
-
-		for (String item : listItens) {
-			String nameCollum = mapFields.get(item);
-			cols.add(createAbstractColumn(item, nameCollum, getClassField(item)));
-		}
-
-		return cols;
 	}
 
 	/**
@@ -220,20 +227,16 @@ public abstract class GenericGeneratorReporter extends
 	/**
 	 * Deverá ser implementado para gerar o relatorio para cada projeto
 	 * 
-	 * @param orderItens
-	 * @param listItens
-	 * @param listReport
-	 * 
 	 * @return
 	 */
-	protected abstract DynamicReport buildReport();
+	protected abstract JasperReportBuilder buildReport();
 
 	public Return generateReport() {
-		initReport(); // Não esquecer de chamar essse método antes de executar o
-						// doReport()
-		Return ret = new Return(true);
+		initReport(); 
 
-		doReport();
+		Return ret = new Return(true);
+		ret.concat(doReport());
+		
 		return ret;
 	}
 }
