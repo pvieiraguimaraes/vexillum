@@ -47,6 +47,7 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 
 	public void setEntity(E entity) {
 		this.entity = entity;
+		this.data.put("entity", entity);
 	}
 
 	public Class<E> getClassEntity() {
