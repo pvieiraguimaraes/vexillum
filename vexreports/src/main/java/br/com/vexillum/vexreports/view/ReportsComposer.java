@@ -1,12 +1,20 @@
 package br.com.vexillum.vexreports.view;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Scope;
+import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zul.Iframe;
 
 import br.com.vexillum.control.GenericControl;
+import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.util.Return;
 import br.com.vexillum.vexreports.control.GenericGeneratorReporter;
@@ -27,11 +35,21 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	private Map<String, String> mapFieldsName;
 
 	private boolean followAnnotation = true;
-	
+
 	private boolean concatenatedReports = false;
-	
+
 	private Map params;
-	
+
+	private ServletOutputStream outputStream;
+
+	public ServletOutputStream getOutputStream() {
+		return outputStream;
+	}
+
+	public void setOutputStream(ServletOutputStream outputStream) {
+		this.outputStream = outputStream;
+	}
+
 	public boolean getConcatenatedReports() {
 		return concatenatedReports;
 	}
@@ -92,6 +110,7 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		loadBinder();
+		getOutputStreamZK();
 	}
 
 	/**
@@ -106,7 +125,23 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	public Return generateReport() {
 		Return ret = new Return(true);
 		ret.concat(generateReport(getListEntity()));
+		
+//		Component comp = Executions.createComponents("/template/report.zul", null, null);
+//		((Iframe)comp).setContent((Media) getOutputStream());
+		
 		return ret;
+	}
+
+	//TODO Não será tão fácil assim mandar para a visão
+	private void getOutputStreamZK() {
+		try {
+			ServletOutputStream outputStream = ((HttpServletResponse) Executions
+					.getCurrent().getNativeResponse()).getOutputStream();
+			setOutputStream(outputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+			new ExceptionManager(e).treatException();
+		}
 	}
 
 	@SuppressWarnings({ "unchecked", "null" })
