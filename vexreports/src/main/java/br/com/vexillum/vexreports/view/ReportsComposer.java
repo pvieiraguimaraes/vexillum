@@ -31,6 +31,10 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	private String[] listItens;
 
 	private boolean withTemplate;
+	
+	private boolean withHeader;
+	
+	private boolean withFooter;
 
 	private Map<String, String> mapFieldsName;
 
@@ -106,6 +110,22 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		this.params = params;
 	}
 
+	public boolean getWithHeader() {
+		return withHeader;
+	}
+
+	public void setWithHeader(boolean withHeader) {
+		this.withHeader = withHeader;
+	}
+
+	public boolean getWithFooter() {
+		return withFooter;
+	}
+
+	public void setWithFooter(boolean withFooter) {
+		this.withFooter = withFooter;
+	}
+	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
