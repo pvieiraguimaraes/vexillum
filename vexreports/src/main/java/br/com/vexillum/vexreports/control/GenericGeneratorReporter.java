@@ -2,7 +2,6 @@ package br.com.vexillum.vexreports.control;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,10 +10,11 @@ import javax.servlet.ServletOutputStream;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.jasper.builder.export.ExporterBuilders;
-import net.sf.dynamicreports.jasper.builder.export.JasperHtmlExporterBuilder;
 import net.sf.dynamicreports.jasper.builder.export.JasperPdfExporterBuilder;
+import net.sf.dynamicreports.report.base.DRReport;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.column.Columns;
+import net.sf.dynamicreports.report.builder.component.ComponentBuilder;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilders;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilders;
@@ -22,7 +22,6 @@ import net.sf.dynamicreports.report.exception.DRException;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import ar.com.fdvs.dj.domain.builders.DynamicReportBuilder;
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
@@ -60,6 +59,16 @@ public abstract class GenericGeneratorReporter extends
 	 * True, Caso queira adicionar um template ao relatório
 	 */
 	protected boolean withTemplate = false;
+	
+	/**
+	 * True, Caso queira adicionar um cabeçalho ao relatório
+	 */
+	protected boolean withHeader = true;
+	
+	/**
+	 * True, Caso queira adicionar um rodapé ao relatório
+	 */
+	protected boolean withFooter = true;
 
 	/**
 	 * Se True estabelece que utilizará os valores anotados {@link ReportField}
@@ -75,35 +84,28 @@ public abstract class GenericGeneratorReporter extends
 	protected Map<String, String> mapFieldsName;
 
 	protected JasperReportBuilder report;
-	
-	
-	
+
 	protected StyleBuilders styleBuider;
-	
-	
-	
+
 	/**
 	 * Output Stream para devolver o relatório para o ZK
 	 */
 	protected ServletOutputStream outputStream;
-	
-	
-	
-	
-	
+
 	/**
 	 * Estilo do Título na coluna do relatório podendo ser alterado
 	 */
 	protected StyleBuilder columnTitleStyle;
-	
-	
-	
+
 	protected StyleBuilder boldCenteredStyle;
-	
+
 	protected StyleBuilder boldStyle;
 
+	protected ComponentBuilders component;
 	
-	protected ComponentBuilders component;	
+	protected ComponentBuilder<?, ?> dynamicReportsComponent;
+	
+	protected ComponentBuilder<?, ?> footerComponent;
 
 	public GenericGeneratorReporter() {
 		super(null);
@@ -122,6 +124,8 @@ public abstract class GenericGeneratorReporter extends
 	private void initReport() {
 		listReport = (List<CommonEntity>) data.get("listReport");
 		withTemplate = (Boolean) data.get("withTemplate");
+		withHeader = (Boolean) data.get("withHeader");
+		withFooter = (Boolean) data.get("withFooter");
 
 		followAnnotation = (Boolean) data.get("followAnnotation");
 
@@ -151,17 +155,30 @@ public abstract class GenericGeneratorReporter extends
 		try {
 			generateDataReport();
 			report = buildReport();
-//			report.show(); Funciona somente para Java Application
+
+			if (withTemplate)
+				getTemplateReport();
 			
+			if(withHeader)
+				getHeaderReport();
+			
+			if(withFooter)
+				getFooterReport();
+			
+			// report.show(); Funciona somente para Java Application
+
 			ExporterBuilders export = new ExporterBuilders();
-			JasperPdfExporterBuilder pdfExporter = export.pdfExporter("D:/report.pdf");
-			
-//			JasperHtmlExporterBuilder htmlExporterBuilder = export.htmlExporter(outputStream);
-			
-//			report.toHtml(htmlExporterBuilder);
-			
+			JasperPdfExporterBuilder pdfExporter = export
+					.pdfExporter("D:/report.pdf");
+
+			// JasperHtmlExporterBuilder htmlExporterBuilder =
+			// export.htmlExporter(outputStream);
+
+			// report.toHtml(htmlExporterBuilder);
+
 			report.toPdf(pdfExporter);
 			
+
 		} catch (NullPointerException e) {
 			ret.setValid(false);
 			e = new NullPointerException(
@@ -239,7 +256,17 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected abstract void getTemplateReport();
+	protected void getTemplateReport(){}
+	
+	/**
+	 * Método que seta o cabeçalho para o relatório, sobrescrevê-lo para setar um cabeçalho.
+	 */
+	protected void getHeaderReport(){}
+	
+	/**
+	 * Método que seta o rodapé no relatório, sobrescrevê-lo para setar um rodapé.
+	 */
+	protected void getFooterReport(){}
 
 	/**
 	 * Deverá ser implementado para gerar o relatorio para cada projeto
