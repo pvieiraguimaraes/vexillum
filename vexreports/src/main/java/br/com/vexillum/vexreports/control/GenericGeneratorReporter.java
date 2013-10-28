@@ -1,23 +1,28 @@
 package br.com.vexillum.vexreports.control;
 
-import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
+
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.jasper.builder.export.ExporterBuilders;
+import net.sf.dynamicreports.jasper.builder.export.JasperHtmlExporterBuilder;
+import net.sf.dynamicreports.jasper.builder.export.JasperPdfExporterBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.column.ColumnBuilder;
+import net.sf.dynamicreports.report.builder.column.Columns;
+import net.sf.dynamicreports.report.builder.component.ComponentBuilders;
+import net.sf.dynamicreports.report.builder.style.StyleBuilder;
+import net.sf.dynamicreports.report.builder.style.StyleBuilders;
 import net.sf.dynamicreports.report.exception.DRException;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperPrint;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import ar.com.fdvs.dj.domain.builders.DynamicReportBuilder;
-import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
@@ -68,12 +73,43 @@ public abstract class GenericGeneratorReporter extends
 	 * "Ativado"
 	 */
 	protected Map<String, String> mapFieldsName;
-	
+
 	protected JasperReportBuilder report;
+	
+	
+	
+	protected StyleBuilders styleBuider;
+	
+	
+	
+	/**
+	 * Output Stream para devolver o relatório para o ZK
+	 */
+	protected ServletOutputStream outputStream;
+	
+	
+	
+	
+	
+	/**
+	 * Estilo do Título na coluna do relatório podendo ser alterado
+	 */
+	protected StyleBuilder columnTitleStyle;
+	
+	
+	
+	protected StyleBuilder boldCenteredStyle;
+	
+	protected StyleBuilder boldStyle;
+
+	
+	protected ComponentBuilders component;	
 
 	public GenericGeneratorReporter() {
 		super(null);
 		report = DynamicReports.report();
+		styleBuider = new StyleBuilders();
+		component = new ComponentBuilders();
 		try {
 			reportConfig = SpringFactory.getInstance().getBean(
 					"reportConfiguration", Properties.class);
@@ -93,6 +129,7 @@ public abstract class GenericGeneratorReporter extends
 		mapFieldsName = (Map<String, String>) data.get("mapFieldsName");
 
 		params = (Map) data.get("params");
+		outputStream = (ServletOutputStream) data.get("outputStream");
 
 		initEntities();
 	}
@@ -113,27 +150,18 @@ public abstract class GenericGeneratorReporter extends
 		Return ret = new Return(true);
 		try {
 			generateDataReport();
-			
 			report = buildReport();
-			report.setDataSource(listReport);
+//			report.show(); Funciona somente para Java Application
 			
-			report.show();
+			ExporterBuilders export = new ExporterBuilders();
+			JasperPdfExporterBuilder pdfExporter = export.pdfExporter("D:/report.pdf");
 			
-//			JasperPrint jasperPrint = null;
-//			
-//			if (!params.isEmpty())
-//
-//			// JasperViewer.viewReport(jasperPrint);
-//			ReportExporter.exportReport(jasperPrint,
-//					"D:/Reports TESTE/ReflectiveReportTest.pdf");
-//			// TODO Serve para exportar o relatório em um ficheiro.
-//			return ret;
-//		} catch (JRException e) {
-//			ret.setValid(false);
-//			new ExceptionManager(e).treatException();
-//		} catch (FileNotFoundException e) {
-//			ret.setValid(false);
-//			new ExceptionManager(e).treatException();
+//			JasperHtmlExporterBuilder htmlExporterBuilder = export.htmlExporter(outputStream);
+			
+//			report.toHtml(htmlExporterBuilder);
+			
+			report.toPdf(pdfExporter);
+			
 		} catch (NullPointerException e) {
 			ret.setValid(false);
 			e = new NullPointerException(
@@ -183,26 +211,16 @@ public abstract class GenericGeneratorReporter extends
 		return array;
 	}
 
-	@SuppressWarnings("unchecked")
-	public ColumnBuilder<?, ?> createColluns(String[] listItens,
-			Map<String, String> mapFields) {
-		
-//		ColumnBuilder<?, ?> builder = new ;
-		
-		List<AbstractColumn> cols = new ArrayList();
-
+	public void createColluns(String[] listItens, Map<String, String> mapFields) {
 		for (String item : listItens) {
 			String nameCollum = mapFields.get(item);
-			cols.add(createColumn(item, nameCollum, getClassField(item)));
+			createColumn(item, nameCollum, getClassField(item));
 		}
-
-		return null;
 	}
-	
-	private AbstractColumn createColumn(String item, String nameCollum,
-			Class classField) {
 
-		return null;
+	@SuppressWarnings("unchecked")
+	public void createColumn(String item, String nameCollum, Class classField) {
+		report.addColumn(Columns.column(nameCollum, item, classField));
 	}
 
 	private Class getClassField(String nameField) {
@@ -221,8 +239,7 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected abstract DynamicReportBuilder getTemplateReport(
-			DynamicReportBuilder reportBuilder);
+	protected abstract void getTemplateReport();
 
 	/**
 	 * Deverá ser implementado para gerar o relatorio para cada projeto
@@ -232,11 +249,11 @@ public abstract class GenericGeneratorReporter extends
 	protected abstract JasperReportBuilder buildReport();
 
 	public Return generateReport() {
-		initReport(); 
+		initReport();
 
 		Return ret = new Return(true);
 		ret.concat(doReport());
-		
+
 		return ret;
 	}
 }
