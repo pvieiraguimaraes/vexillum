@@ -2,6 +2,7 @@ package br.com.vexillum.vexreports.control;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,13 +12,14 @@ import javax.servlet.ServletOutputStream;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.jasper.builder.export.ExporterBuilders;
 import net.sf.dynamicreports.jasper.builder.export.JasperPdfExporterBuilder;
-import net.sf.dynamicreports.report.base.DRReport;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.column.Columns;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilders;
 import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.builder.style.StyleBuilders;
+import net.sf.dynamicreports.report.constant.HorizontalAlignment;
+import net.sf.dynamicreports.report.constant.VerticalAlignment;
 import net.sf.dynamicreports.report.exception.DRException;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -59,12 +61,12 @@ public abstract class GenericGeneratorReporter extends
 	 * True, Caso queira adicionar um template ao relatório
 	 */
 	protected boolean withTemplate = false;
-	
+
 	/**
 	 * True, Caso queira adicionar um cabeçalho ao relatório
 	 */
 	protected boolean withHeader = true;
-	
+
 	/**
 	 * True, Caso queira adicionar um rodapé ao relatório
 	 */
@@ -90,7 +92,7 @@ public abstract class GenericGeneratorReporter extends
 	/**
 	 * Output Stream para devolver o relatório para o ZK
 	 */
-	protected ServletOutputStream outputStream;
+	protected ServletOutputStream outputStream;// Não usado ainda
 
 	/**
 	 * Estilo do Título na coluna do relatório podendo ser alterado
@@ -102,9 +104,9 @@ public abstract class GenericGeneratorReporter extends
 	protected StyleBuilder boldStyle;
 
 	protected ComponentBuilders component;
-	
+
 	protected ComponentBuilder<?, ?> dynamicReportsComponent;
-	
+
 	protected ComponentBuilder<?, ?> footerComponent;
 
 	public GenericGeneratorReporter() {
@@ -158,13 +160,13 @@ public abstract class GenericGeneratorReporter extends
 
 			if (withTemplate)
 				getTemplateReport();
-			
-			if(withHeader)
+
+			if (withHeader)
 				getHeaderReport();
-			
-			if(withFooter)
+
+			if (withFooter)
 				getFooterReport();
-			
+
 			// report.show(); Funciona somente para Java Application
 
 			ExporterBuilders export = new ExporterBuilders();
@@ -177,7 +179,6 @@ public abstract class GenericGeneratorReporter extends
 			// report.toHtml(htmlExporterBuilder);
 
 			report.toPdf(pdfExporter);
-			
 
 		} catch (NullPointerException e) {
 			ret.setValid(false);
@@ -199,6 +200,15 @@ public abstract class GenericGeneratorReporter extends
 			readAnnotatedFields();
 	}
 
+	/**
+	 * Método responsável por ler os campos anotados e mapear os nomes que
+	 * deverão aparecer no relatório sendo assim sua execução é a seguinte: 
+	 * 		1º) Tenta ler a anotação {@link ReportField} os valores para os campos name e
+	 * order, nome e ordem, respectivamente;
+	 * 		2º) Caso encontre valores para essas variaveis seta o nome no Map dos nomes e 
+	 * coloca o item na ordem dada no vetor de itens;
+	 * 		3º) Por fim, se não encontrar na anotação o nome seta o próprio nome do field mesmo; 
+	 */
 	private void readAnnotatedFields() {
 		List<String> resultListItens = new ArrayList<>();
 		if (!listReport.isEmpty()) {
@@ -207,8 +217,10 @@ public abstract class GenericGeneratorReporter extends
 					ReportField.class);
 			for (Field field : fields) {
 				ReportField annotation = field.getAnnotation(ReportField.class);
-				if (annotation.name() != "")
+				if (annotation.name() != "" || annotation.name() != null)
 					mapFieldsName.put(field.getName(), annotation.name());
+				else
+					mapFieldsName.put(field.getName(), field.getName());					
 				if (annotation.order() != 0)
 					resultListItens
 							.add(annotation.order() - 1, field.getName());
@@ -237,7 +249,13 @@ public abstract class GenericGeneratorReporter extends
 
 	@SuppressWarnings("unchecked")
 	public void createColumn(String item, String nameCollum, Class classField) {
-		report.addColumn(Columns.column(nameCollum, item, classField));
+		report.addColumn(Columns
+				.column(nameCollum, item, classField)
+				.setWidth(getColumnWidth(classField))
+				.setStyle(
+						styleBuider.style().setAlignment(
+								HorizontalAlignment.CENTER,
+								VerticalAlignment.JUSTIFIED)));
 	}
 
 	private Class getClassField(String nameField) {
@@ -256,17 +274,22 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected void getTemplateReport(){}
-	
+	protected void getTemplateReport() {
+	}
+
 	/**
-	 * Método que seta o cabeçalho para o relatório, sobrescrevê-lo para setar um cabeçalho.
+	 * Método que seta o cabeçalho para o relatório, sobrescrevê-lo para setar
+	 * um cabeçalho.
 	 */
-	protected void getHeaderReport(){}
-	
+	protected void getHeaderReport() {
+	}
+
 	/**
-	 * Método que seta o rodapé no relatório, sobrescrevê-lo para setar um rodapé.
+	 * Método que seta o rodapé no relatório, sobrescrevê-lo para setar um
+	 * rodapé.
 	 */
-	protected void getFooterReport(){}
+	protected void getFooterReport() {
+	}
 
 	/**
 	 * Deverá ser implementado para gerar o relatorio para cada projeto
@@ -282,5 +305,29 @@ public abstract class GenericGeneratorReporter extends
 		ret.concat(doReport());
 
 		return ret;
+	}
+
+	/**
+	 * Método tirado do DynamicJasper, que seta por padrão os valores da largura
+	 * das colunas
+	 * 
+	 * @param classz
+	 * @return
+	 */
+	private int getColumnWidth(Class classz) {
+		if (Float.class.isAssignableFrom(classz)
+				|| Double.class.isAssignableFrom(classz)) {
+			return 70;
+		} else if (classz == Boolean.class) {
+			return 10;
+		} else if (Number.class.isAssignableFrom(classz)) {
+			return 60;
+		} else if (classz == String.class) {
+			return 100;
+		} else if (Date.class.isAssignableFrom(classz)) {
+			return 50;
+		} else {
+			return 50;
+		}
 	}
 }

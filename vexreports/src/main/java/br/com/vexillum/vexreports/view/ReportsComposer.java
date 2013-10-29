@@ -1,6 +1,7 @@
 package br.com.vexillum.vexreports.view;
 
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -8,10 +9,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.annotation.Scope;
-import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zul.Iframe;
 
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
@@ -31,10 +30,10 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	private String[] listItens;
 
 	private boolean withTemplate;
-	
-	private boolean withHeader;
-	
-	private boolean withFooter;
+
+	private boolean withHeader = true;
+
+	private boolean withFooter = true;
 
 	private Map<String, String> mapFieldsName;
 
@@ -125,12 +124,12 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	public void setWithFooter(boolean withFooter) {
 		this.withFooter = withFooter;
 	}
-	
+
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		loadBinder();
-		getOutputStreamZK();
+		// getOutputStreamZK();
 	}
 
 	/**
@@ -145,14 +144,15 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	public Return generateReport() {
 		Return ret = new Return(true);
 		ret.concat(generateReport(getListEntity()));
-		
-//		Component comp = Executions.createComponents("/template/report.zul", null, null);
-//		((Iframe)comp).setContent((Media) getOutputStream());
-		
+
+		// Component comp = Executions.createComponents("/template/report.zul",
+		// null, null);
+		// ((Iframe)comp).setContent((Media) getOutputStream());
+
 		return ret;
 	}
 
-	//TODO Não será tão fácil assim mandar para a visão
+	// TODO Não será tão fácil assim mandar para a visão
 	private void getOutputStreamZK() {
 		try {
 			ServletOutputStream outputStream = ((HttpServletResponse) Executions
@@ -179,6 +179,19 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 															// gerador
 		ret.concat(controller.doAction("generateReport"));
 		return ret;
+	}
+
+	public void showReport() {
+		Hashtable h = new Hashtable();
+		h.put("Path", "/var/temp/");
+		h.put("File", "test.pdf");
+		
+		String pathClass = this.getClass().getResource("").getFile();
+		String pathApplication = pathClass.substring(0,
+				pathClass.indexOf("WEB-INF"));
+		
+		Executions.getCurrent().createComponents(
+				"/template/reportView.zul",null, h);
 	}
 
 }
