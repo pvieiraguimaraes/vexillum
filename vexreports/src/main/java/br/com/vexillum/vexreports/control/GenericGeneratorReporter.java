@@ -23,6 +23,7 @@ import net.sf.dynamicreports.report.constant.VerticalAlignment;
 import net.sf.dynamicreports.report.exception.DRException;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.GenericControl;
@@ -45,6 +46,8 @@ public abstract class GenericGeneratorReporter extends
 	protected Map params;
 
 	protected Properties reportConfig;
+
+	protected String titleReport;
 
 	/**
 	 * Lista da qual será gerada o relatório
@@ -73,6 +76,11 @@ public abstract class GenericGeneratorReporter extends
 	protected boolean withFooter = true;
 
 	/**
+	 * True, Caso queira que seja adicionado um título.
+	 */
+	protected boolean withTitle = true;
+
+	/**
 	 * Se True estabelece que utilizará os valores anotados {@link ReportField}
 	 */
 	protected boolean followAnnotation = true;
@@ -95,7 +103,7 @@ public abstract class GenericGeneratorReporter extends
 	protected ServletOutputStream outputStream;// Não usado ainda
 
 	/**
-	 * Estilo do Título na coluna do relatório podendo ser alterado
+	 * Construtores de Estilos
 	 */
 	protected StyleBuilder columnTitleStyle;
 
@@ -103,6 +111,9 @@ public abstract class GenericGeneratorReporter extends
 
 	protected StyleBuilder boldStyle;
 
+	/**
+	 * Contrutores de componentes
+	 */
 	protected ComponentBuilders component;
 
 	protected ComponentBuilder<?, ?> dynamicReportsComponent;
@@ -114,6 +125,7 @@ public abstract class GenericGeneratorReporter extends
 		report = DynamicReports.report();
 		styleBuider = new StyleBuilders();
 		component = new ComponentBuilders();
+
 		try {
 			reportConfig = SpringFactory.getInstance().getBean(
 					"reportConfiguration", Properties.class);
@@ -125,9 +137,13 @@ public abstract class GenericGeneratorReporter extends
 	@SuppressWarnings("unchecked")
 	private void initReport() {
 		listReport = (List<CommonEntity>) data.get("listReport");
+
+		titleReport = (String) data.get("titleReport");
+
 		withTemplate = (Boolean) data.get("withTemplate");
 		withHeader = (Boolean) data.get("withHeader");
 		withFooter = (Boolean) data.get("withFooter");
+		withTitle = (Boolean) data.get("withTitle");
 
 		followAnnotation = (Boolean) data.get("followAnnotation");
 
@@ -152,6 +168,7 @@ public abstract class GenericGeneratorReporter extends
 			params = new HashMap();
 	}
 
+	@SuppressWarnings("unchecked")
 	public Return doReport() {
 		Return ret = new Return(true);
 		try {
@@ -167,11 +184,17 @@ public abstract class GenericGeneratorReporter extends
 			if (withFooter)
 				getFooterReport();
 
+			if (withTitle)
+				getTitleReport();
+			
+			if(params != null && !params.isEmpty())
+				report.setParameters(params);
+
 			// report.show(); Funciona somente para Java Application
 
 			ExporterBuilders export = new ExporterBuilders();
 			JasperPdfExporterBuilder pdfExporter = export
-					.pdfExporter("D:/report.pdf");
+					.pdfExporter("D:/Reports TESTE/certos/report.pdf");
 
 			// JasperHtmlExporterBuilder htmlExporterBuilder =
 			// export.htmlExporter(outputStream);
@@ -202,12 +225,12 @@ public abstract class GenericGeneratorReporter extends
 
 	/**
 	 * Método responsável por ler os campos anotados e mapear os nomes que
-	 * deverão aparecer no relatório sendo assim sua execução é a seguinte: 
-	 * 		1º) Tenta ler a anotação {@link ReportField} os valores para os campos name e
-	 * order, nome e ordem, respectivamente;
-	 * 		2º) Caso encontre valores para essas variaveis seta o nome no Map dos nomes e 
-	 * coloca o item na ordem dada no vetor de itens;
-	 * 		3º) Por fim, se não encontrar na anotação o nome seta o próprio nome do field mesmo; 
+	 * deverão aparecer no relatório sendo assim sua execução é a seguinte: 1º)
+	 * Tenta ler a anotação {@link ReportField} os valores para os campos name e
+	 * order, nome e ordem, respectivamente; 2º) Caso encontre valores para
+	 * essas variaveis seta o nome no Map dos nomes e coloca o item na ordem
+	 * dada no vetor de itens; 3º) Por fim, se não encontrar na anotação o nome
+	 * seta o próprio nome do field mesmo;
 	 */
 	private void readAnnotatedFields() {
 		List<String> resultListItens = new ArrayList<>();
@@ -220,7 +243,7 @@ public abstract class GenericGeneratorReporter extends
 				if (annotation.name() != "" || annotation.name() != null)
 					mapFieldsName.put(field.getName(), annotation.name());
 				else
-					mapFieldsName.put(field.getName(), field.getName());					
+					mapFieldsName.put(field.getName(), field.getName());
 				if (annotation.order() != 0)
 					resultListItens
 							.add(annotation.order() - 1, field.getName());
@@ -230,6 +253,19 @@ public abstract class GenericGeneratorReporter extends
 			}
 			listItens = convertListInArray(resultListItens);
 		}
+	}
+
+	public String createTitleReport() {
+		if (!listReport.isEmpty()) {
+			ICommonEntity entity = (ICommonEntity) listReport.get(0);
+			String nameEntity = entity.getClass().getSimpleName();
+
+			String nameReport = "REPORT_NAME_"
+					+ StringUtils.upperCase(nameEntity);
+
+			return reportConfig.getKey(nameReport);
+		}
+		return null;
 	}
 
 	private String[] convertListInArray(List<String> resultListItens) {
@@ -289,6 +325,13 @@ public abstract class GenericGeneratorReporter extends
 	 * rodapé.
 	 */
 	protected void getFooterReport() {
+	}
+
+	/**
+	 * Método que seta o Título no relatório, de acordo com o que for
+	 * implementado, bastanto sobrescrevê-lo
+	 */
+	protected void getTitleReport() {
 	}
 
 	/**

@@ -34,16 +34,20 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	private boolean withHeader = true;
 
 	private boolean withFooter = true;
+	
+	private boolean withTitle = true;
 
 	private Map<String, String> mapFieldsName;
 
 	private boolean followAnnotation = true;
 
-	private boolean concatenatedReports = false;
+	private boolean concatenatedReports = false;//TODO Não está sendo usado por enquanto
 
 	private Map params;
 
 	private ServletOutputStream outputStream;
+	
+	private String titleReport;
 
 	public ServletOutputStream getOutputStream() {
 		return outputStream;
@@ -123,6 +127,22 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 
 	public void setWithFooter(boolean withFooter) {
 		this.withFooter = withFooter;
+	}
+
+	public boolean getWithTitle() {
+		return withTitle;
+	}
+
+	public void setWithTitle(boolean withTitle) {
+		this.withTitle = withTitle;
+	}
+	
+	public String getTitleReport() {
+		return titleReport;
+	}
+
+	public void setTitleReport(String titleReport) {
+		this.titleReport = titleReport;
 	}
 
 	@Override
