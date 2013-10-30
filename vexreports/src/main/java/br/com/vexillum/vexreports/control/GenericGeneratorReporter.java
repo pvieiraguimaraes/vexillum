@@ -2,6 +2,7 @@ package br.com.vexillum.vexreports.control;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -169,25 +170,40 @@ public abstract class GenericGeneratorReporter extends
 	}
 
 	@SuppressWarnings("unchecked")
+	public JasperReportBuilder createReport(Collection<?> dataSource,
+			Map param, boolean subReportTemplate, boolean subReportHeader,
+			boolean subReportFooter, boolean subReportTitle) {
+		JasperReportBuilder report = new JasperReportBuilder();
+
+		report.setDataSource(dataSource);
+		report.setParameters(param);
+
+		if (subReportTemplate)
+			report = getTemplateReport(report);
+
+		if (subReportHeader)
+			report = getHeaderReport(report);
+
+		if (subReportHeader)
+			report = getFooterReport(report);
+
+		if (subReportTitle)
+			report = getTitleReport(report);
+
+		return report;
+	}
+
+	@SuppressWarnings("unchecked")
 	public Return doReport() {
 		Return ret = new Return(true);
 		try {
 			generateDataReport();
 			report = buildReport();
 
-			if (withTemplate)
-				getTemplateReport();
+			report = createReport(listReport, params, withTemplate, withHeader,
+					withFooter, withTitle);
 
-			if (withHeader)
-				getHeaderReport();
-
-			if (withFooter)
-				getFooterReport();
-
-			if (withTitle)
-				getTitleReport();
-			
-			if(params != null && !params.isEmpty())
+			if (params != null && !params.isEmpty())
 				report.setParameters(params);
 
 			// report.show(); Funciona somente para Java Application
@@ -276,16 +292,21 @@ public abstract class GenericGeneratorReporter extends
 		return array;
 	}
 
-	public void createColluns(String[] listItens, Map<String, String> mapFields) {
+	public JasperReportBuilder createColluns(String[] listItens,
+			Map<String, String> mapFields, JasperReportBuilder report) {
+		JasperReportBuilder reportBuilder = new JasperReportBuilder();
 		for (String item : listItens) {
 			String nameCollum = mapFields.get(item);
-			createColumn(item, nameCollum, getClassField(item));
+			reportBuilder = createColumn(item, nameCollum, getClassField(item),
+					report);
 		}
+		return reportBuilder;
 	}
 
 	@SuppressWarnings("unchecked")
-	public void createColumn(String item, String nameCollum, Class classField) {
-		report.addColumn(Columns
+	public JasperReportBuilder createColumn(String item, String nameCollum,
+			Class classField, JasperReportBuilder report) {
+		return report.addColumn(Columns
 				.column(nameCollum, item, classField)
 				.setWidth(getColumnWidth(classField))
 				.setStyle(
@@ -310,28 +331,32 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected void getTemplateReport() {
+	protected JasperReportBuilder getTemplateReport(JasperReportBuilder report) {
+		return report;
 	}
 
 	/**
 	 * Método que seta o cabeçalho para o relatório, sobrescrevê-lo para setar
 	 * um cabeçalho.
 	 */
-	protected void getHeaderReport() {
+	protected JasperReportBuilder getHeaderReport(JasperReportBuilder report) {
+		return report;
 	}
 
 	/**
 	 * Método que seta o rodapé no relatório, sobrescrevê-lo para setar um
 	 * rodapé.
 	 */
-	protected void getFooterReport() {
+	protected JasperReportBuilder getFooterReport(JasperReportBuilder report) {
+		return report;
 	}
 
 	/**
 	 * Método que seta o Título no relatório, de acordo com o que for
 	 * implementado, bastanto sobrescrevê-lo
 	 */
-	protected void getTitleReport() {
+	protected JasperReportBuilder getTitleReport(JasperReportBuilder report) {
+		return report;
 	}
 
 	/**
