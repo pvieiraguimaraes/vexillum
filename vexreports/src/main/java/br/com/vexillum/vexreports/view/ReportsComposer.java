@@ -41,7 +41,7 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 
 	private boolean followAnnotation = true;
 
-	private boolean concatenatedReports = false;//TODO Não está sendo usado por enquanto
+	private boolean concatenatedReports = false; //TODO Não está sendo usado por enquanto
 
 	private Map params;
 
@@ -186,17 +186,22 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	@SuppressWarnings({ "unchecked", "null" })
 	public Return generateReport(List list) {
 		Return ret = new Return(true);
-		if (list != null || !list.isEmpty())
+
+		GenericControl controller = getGeneratorReport();
+		
+		if (list != null || !list.isEmpty()){
 			listReport = list;
-		else {
+			ret.concat(controller.doAction("generateReport"));
+		}
+		else if (params != null || !params.isEmpty()){
+			ret.concat(controller.doAction("generateReport"));
+		} else {
 			ret.setValid(false);
 			String msg = "A lista do parâmetro ou o listEntity não podem ser nulos";
 			throw new NullPointerException(msg);
+			//TODO Tratar como para disparar uma mensagem de excption..
 		}
 
-		GenericControl controller = getGeneratorReport(); // Tenta buscar um
-															// gerador
-		ret.concat(controller.doAction("generateReport"));
 		return ret;
 	}
 
