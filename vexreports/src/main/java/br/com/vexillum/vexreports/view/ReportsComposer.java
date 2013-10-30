@@ -148,7 +148,6 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		loadBinder();
 		// getOutputStreamZK();
 	}
 
