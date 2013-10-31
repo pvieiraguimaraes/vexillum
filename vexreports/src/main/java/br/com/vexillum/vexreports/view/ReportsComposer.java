@@ -196,22 +196,19 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	@SuppressWarnings({ "unchecked", "null" })
 	public Return generateReport(List list) {
 		Return ret = new Return(true);
-
-		GenericControl controller = getGeneratorReport();
 		
-		if (list != null || !list.isEmpty()){
-			listReport = list;
-			ret.concat(controller.doAction("generateReport"));
-		}
-		else if (params != null || !params.isEmpty()){
-			ret.concat(controller.doAction("generateReport"));
-		} else {
+		if (list != null || !list.isEmpty())
+			setListReport(list);
+		else {
 			ret.setValid(false);
 			String msg = "A lista do parâmetro ou o listEntity não podem ser nulos";
 			throw new NullPointerException(msg);
 			//TODO Tratar como para disparar uma mensagem de excption..
 		}
-
+		
+		GenericControl controller = getGeneratorReport();
+		ret.concat(controller.doAction("generateReport"));
+		
 		return ret;
 	}
 
