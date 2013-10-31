@@ -345,7 +345,7 @@ public abstract class GenericGeneratorReporter extends
 	protected JasperReportBuilder getHeaderReport(JasperReportBuilder report, String actionHeader) {
 		Return ret = new Return(true);
 		data.put("report", report);
-		ret.concat(doAction(actionHeader));
+		ret.concat(doAction(actionHeader, false));
 		return (JasperReportBuilder) ret.getList().get(0);
 	}
 
@@ -356,7 +356,7 @@ public abstract class GenericGeneratorReporter extends
 	protected JasperReportBuilder getFooterReport(JasperReportBuilder report, String actionFooter) {
 		Return ret = new Return(true);
 		data.put("report", report);
-		ret.concat(doAction(actionFooter));
+		ret.concat(doAction(actionFooter, false));
 		return (JasperReportBuilder) ret.getList().get(0);
 	}
 
@@ -367,7 +367,7 @@ public abstract class GenericGeneratorReporter extends
 	protected JasperReportBuilder getTitleReport(JasperReportBuilder report, String actionTitle) {
 		Return ret = new Return(true);
 		data.put("report", report);
-		ret.concat(doAction(actionTitle));
+		ret.concat(doAction(actionTitle, false));
 		return (JasperReportBuilder) ret.getList().get(0);
 	}
 
