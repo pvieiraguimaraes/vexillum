@@ -120,6 +120,8 @@ public abstract class GenericGeneratorReporter extends
 	protected ComponentBuilder<?, ?> dynamicReportsComponent;
 
 	protected ComponentBuilder<?, ?> footerComponent;
+	
+	protected String pathTemplate;
 
 	public GenericGeneratorReporter() {
 		super(null);
@@ -152,7 +154,11 @@ public abstract class GenericGeneratorReporter extends
 		mapFieldsName = (Map<String, String>) data.get("mapFieldsName");
 
 		params = (Map) data.get("params");
+		
+		//TODO Ainda não está sendo usado
 		outputStream = (ServletOutputStream) data.get("outputStream");
+		
+		pathTemplate = (String) data.get("pathTemplate");
 
 		initEntities();
 	}
@@ -171,40 +177,38 @@ public abstract class GenericGeneratorReporter extends
 
 	@SuppressWarnings("unchecked")
 	public JasperReportBuilder createReport(Collection<?> dataSource,
-			Map param, boolean subReportTemplate, boolean subReportHeader,
-			boolean subReportFooter, boolean subReportTitle) {
+			Map param, boolean subReportTemplate, boolean subReportHeader, String pathTemplate,
+			boolean subReportFooter, boolean subReportTitle, boolean subFollowAnnotation, String actionHeader, String actionFooter, String actionTitle) {
 		JasperReportBuilder report = new JasperReportBuilder();
 
 		report.setDataSource(dataSource);
 		report.setParameters(param);
 
+		if (subFollowAnnotation)
+			readAnnotatedFields();
+		
+		if(listItens.length != 0 && !mapFieldsName.isEmpty())
+			report = createColluns(listItens, mapFieldsName, report);
+		
 		if (subReportTemplate)
-			report = getTemplateReport(report);
+			report = setTemplateReport(report, pathTemplate);
 
 		if (subReportHeader)
-			report = getHeaderReport(report);
+			report = getHeaderReport(report, actionHeader);
 
 		if (subReportHeader)
-			report = getFooterReport(report);
+			report = getFooterReport(report, actionHeader);
 
 		if (subReportTitle)
-			report = getTitleReport(report);
+			report = getTitleReport(report, actionTitle);
 
 		return report;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Return doReport() {
 		Return ret = new Return(true);
 		try {
-			generateDataReport();
 			report = buildReport();
-
-			report = createReport(listReport, params, withTemplate, withHeader,
-					withFooter, withTitle);
-
-			if (params != null && !params.isEmpty())
-				report.setParameters(params);
 
 			// report.show(); Funciona somente para Java Application
 
@@ -229,14 +233,6 @@ public abstract class GenericGeneratorReporter extends
 			new ExceptionManager(e).treatException();
 		}
 		return ret;
-	}
-
-	/**
-	 * Método seta os valores nas listas para gerar o relatório
-	 */
-	private void generateDataReport() throws NullPointerException {
-		if (followAnnotation)
-			readAnnotatedFields();
 	}
 
 	/**
@@ -271,7 +267,7 @@ public abstract class GenericGeneratorReporter extends
 		}
 	}
 
-	public String createTitleReport() {
+	public String generateTitleReport() {
 		if (!listReport.isEmpty()) {
 			ICommonEntity entity = (ICommonEntity) listReport.get(0);
 			String nameEntity = entity.getClass().getSimpleName();
@@ -331,7 +327,14 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected JasperReportBuilder getTemplateReport(JasperReportBuilder report) {
+	protected JasperReportBuilder setTemplateReport(JasperReportBuilder report, String pathTemplate) {
+		try {
+			report.setTemplateDesign(pathTemplate);
+		} catch (DRException e) {
+			e.printStackTrace();
+			new ExceptionManager(e).treatException();
+		}
+		
 		return report;
 	}
 
@@ -339,24 +342,33 @@ public abstract class GenericGeneratorReporter extends
 	 * Método que seta o cabeçalho para o relatório, sobrescrevê-lo para setar
 	 * um cabeçalho.
 	 */
-	protected JasperReportBuilder getHeaderReport(JasperReportBuilder report) {
-		return report;
+	protected JasperReportBuilder getHeaderReport(JasperReportBuilder report, String actionHeader) {
+		Return ret = new Return(true);
+		data.put("report", report);
+		ret.concat(doAction(actionHeader));
+		return (JasperReportBuilder) ret.getList().get(0);
 	}
 
 	/**
 	 * Método que seta o rodapé no relatório, sobrescrevê-lo para setar um
 	 * rodapé.
 	 */
-	protected JasperReportBuilder getFooterReport(JasperReportBuilder report) {
-		return report;
+	protected JasperReportBuilder getFooterReport(JasperReportBuilder report, String actionFooter) {
+		Return ret = new Return(true);
+		data.put("report", report);
+		ret.concat(doAction(actionFooter));
+		return (JasperReportBuilder) ret.getList().get(0);
 	}
 
 	/**
 	 * Método que seta o Título no relatório, de acordo com o que for
 	 * implementado, bastanto sobrescrevê-lo
 	 */
-	protected JasperReportBuilder getTitleReport(JasperReportBuilder report) {
-		return report;
+	protected JasperReportBuilder getTitleReport(JasperReportBuilder report, String actionTitle) {
+		Return ret = new Return(true);
+		data.put("report", report);
+		ret.concat(doAction(actionTitle));
+		return (JasperReportBuilder) ret.getList().get(0);
 	}
 
 	/**
