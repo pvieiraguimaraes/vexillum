@@ -241,7 +241,8 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		if(data.get("sql") != null){
 			return persistence.searchByHQL((String) data.get("sql"));
 		} else {
-			return persistence.searchByHQL(entity);
+			String complement =  (data.get("complement") == null ? null : (String)data.get("complement"));
+			return persistence.searchByHQL(entity, complement);
 		}
 		
 	}

@@ -183,10 +183,15 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		}	
 		return ret;
 	}
+	
+	@Override
+	public Return searchByHQL(ICommonEntity entity) {
+		return searchByHQL(entity, null);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Return searchByHQL(ICommonEntity entity) {
+	public Return searchByHQL(ICommonEntity entity, String complement) {
 		Return ret = new Return(true);
 		List<E> lista = new ArrayList<E>();
         
@@ -210,6 +215,10 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 	            hql = hql.concat(groupedCriterias);
 	        } else {
 	        	hql = hql.concat(criterias.get(0));
+	        }
+	        
+	        if(complement != null && !complement.isEmpty()){
+	        	hql += " " + complement;
 	        }
 	        
 	        lista.addAll(getSession().createQuery(hql).list());   
