@@ -88,7 +88,7 @@ public class ImageUtils {
 
             // Draw the scaled image
             BufferedImage thumbImage = new BufferedImage(thumbWidth, thumbHeight,
-                            BufferedImage.TYPE_INT_ARGB);
+                            BufferedImage.TYPE_INT_RGB);
             
             
             

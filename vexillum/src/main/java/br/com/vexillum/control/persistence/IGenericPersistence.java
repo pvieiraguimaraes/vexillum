@@ -15,6 +15,8 @@ public interface IGenericPersistence<E> {
 	
 	public Return searchByHQL(E entidade);
 	
+	public Return searchByHQL(E entidade, String complement);
+	
 	public Return searchByHQL(String hql);
 	
 	public Return searchByNativeSQL(String sql);
