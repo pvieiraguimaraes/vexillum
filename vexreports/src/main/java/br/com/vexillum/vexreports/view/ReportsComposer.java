@@ -48,6 +48,8 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	private ServletOutputStream outputStream;
 	
 	private String titleReport;
+	
+	private String pathTemplate;
 
 	public ServletOutputStream getOutputStream() {
 		return outputStream;
@@ -143,6 +145,14 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 
 	public void setTitleReport(String titleReport) {
 		this.titleReport = titleReport;
+	}
+
+	public String getPathTemplate() {
+		return pathTemplate;
+	}
+
+	public void setPathTemplate(String pathTemplate) {
+		this.pathTemplate = pathTemplate;
 	}
 
 	@Override
