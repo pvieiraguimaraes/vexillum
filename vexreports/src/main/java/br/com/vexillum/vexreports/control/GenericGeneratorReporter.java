@@ -196,7 +196,7 @@ public abstract class GenericGeneratorReporter extends
 		if (subReportHeader)
 			report = getHeaderReport(report, actionHeader);
 
-		if (subReportHeader)
+		if (subReportFooter)
 			report = getFooterReport(report, actionHeader);
 
 		if (subReportTitle)
