@@ -15,7 +15,9 @@ import org.zkoss.zk.ui.Executions;
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.ICommonEntity;
+import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.Return;
+import br.com.vexillum.util.SpringFactory;
 import br.com.vexillum.vexreports.control.GenericGeneratorReporter;
 import br.com.vexillum.view.CRUDComposer;
 
@@ -50,7 +52,7 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	private String titleReport;
 	
 	private String pathTemplate;
-
+	
 	public ServletOutputStream getOutputStream() {
 		return outputStream;
 	}
@@ -167,17 +169,27 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	 * @return
 	 */
 	public GenericGeneratorReporter getGeneratorReport() {
-		return null;
+		return SpringFactory.getController("genericGeneratorReporter",
+				GenericGeneratorReporter.class,	ReflectionUtils.prepareDataForPersistence(this));
+	}
+	
+	public Return generateListEntityReport() {
+		Return ret = new Return(true);
+		ret.concat(generateReport(getListEntity()));
+		return ret;
 	}
 
 	public Return generateReport() {
 		Return ret = new Return(true);
-		ret.concat(generateReport(getListEntity()));
-
-		// Component comp = Executions.createComponents("/template/report.zul",
-		// null, null);
-		// ((Iframe)comp).setContent((Media) getOutputStream());
-
+		
+		if(params != null || !params.isEmpty())
+			ret.concat(getGeneratorReport().doAction("generateReport"));
+		else {
+			ret.setValid(false);
+			String msg = "O Map params não pode ser nulo";
+			throw new NullPointerException(msg);
+			//TODO Tratar como para disparar uma mensagem de excption..
+		}
 		return ret;
 	}
 
@@ -201,13 +213,12 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 			setListReport(list);
 		else {
 			ret.setValid(false);
-			String msg = "A lista do parâmetro ou o listEntity não podem ser nulos";
+			String msg = "A lista não pode ser nula";
 			throw new NullPointerException(msg);
 			//TODO Tratar como para disparar uma mensagem de excption..
 		}
 		
-		GenericControl controller = getGeneratorReport();
-		ret.concat(controller.doAction("generateReport"));
+		ret.concat(getGeneratorReport().doAction("generateReport"));
 		
 		return ret;
 	}
