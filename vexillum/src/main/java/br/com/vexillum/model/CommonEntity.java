@@ -61,7 +61,7 @@ public abstract class CommonEntity implements ICommonEntity {
 			if(entity.getId() == null || entity.getId() != 0){
 				return false;
 			}
-		} else if(getId() != entity.getId()){
+		} else if(!(getId().equals(entity.getId()))){
 			return false;
 		}
 		return true;
