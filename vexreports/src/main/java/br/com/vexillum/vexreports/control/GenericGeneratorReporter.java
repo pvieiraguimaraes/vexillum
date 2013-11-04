@@ -1,6 +1,8 @@
 package br.com.vexillum.vexreports.control;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -13,7 +15,9 @@ import javax.servlet.ServletOutputStream;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.jasper.builder.export.ExporterBuilders;
 import net.sf.dynamicreports.jasper.builder.export.JasperPdfExporterBuilder;
+import net.sf.dynamicreports.report.base.DRReportTemplate;
 import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.ReportTemplateBuilder;
 import net.sf.dynamicreports.report.builder.column.Columns;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilders;
@@ -25,6 +29,7 @@ import net.sf.dynamicreports.report.exception.DRException;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.GenericControl;
@@ -120,15 +125,19 @@ public abstract class GenericGeneratorReporter extends
 	protected ComponentBuilder<?, ?> dynamicReportsComponent;
 
 	protected ComponentBuilder<?, ?> footerComponent;
-	
+
 	protected String pathTemplate;
+
+	protected ReportTemplateBuilder templateBuilder;
+
+	protected DRReportTemplate templateReport;
 
 	public GenericGeneratorReporter() {
 		super(null);
-		report = DynamicReports.report();
+		report = new JasperReportBuilder();
 		styleBuider = new StyleBuilders();
 		component = new ComponentBuilders();
-
+		templateReport = new DRReportTemplate();
 		try {
 			reportConfig = SpringFactory.getInstance().getBean(
 					"reportConfiguration", Properties.class);
@@ -154,10 +163,10 @@ public abstract class GenericGeneratorReporter extends
 		mapFieldsName = (Map<String, String>) data.get("mapFieldsName");
 
 		params = (Map) data.get("params");
-		
-		//TODO Ainda não está sendo usado
+
+		// TODO Ainda não está sendo usado
 		outputStream = (ServletOutputStream) data.get("outputStream");
-		
+
 		pathTemplate = (String) data.get("pathTemplate");
 
 		initEntities();
@@ -177,21 +186,23 @@ public abstract class GenericGeneratorReporter extends
 
 	@SuppressWarnings("unchecked")
 	public JasperReportBuilder createReport(Collection<?> dataSource,
-			Map param, boolean subReportTemplate, boolean subReportHeader, String pathTemplate,
-			boolean subReportFooter, boolean subReportTitle, boolean subFollowAnnotation, String actionHeader, String actionFooter, String actionTitle) {
+			Map param, boolean subReportTemplate, boolean subReportHeader,
+			String pathTemplate, boolean subReportFooter,
+			boolean subReportTitle, boolean subFollowAnnotation,
+			String actionHeader, String actionFooter, String actionTitle, String sql) {
 		JasperReportBuilder report = new JasperReportBuilder();
 
-		report.setDataSource(dataSource);
 		report.setParameters(param);
+		report.setDataSource(dataSource);
 
 		if (subFollowAnnotation)
 			readAnnotatedFields();
-		
-		if(listItens.length != 0 && !mapFieldsName.isEmpty())
+
+		if (listItens.length != 0 && !mapFieldsName.isEmpty())
 			report = createColluns(listItens, mapFieldsName, report);
-		
+
 		if (subReportTemplate)
-			report = setTemplateReport(report, pathTemplate);
+			report = setTemplateReport(report, pathTemplate, sql);
 
 		if (subReportHeader)
 			report = getHeaderReport(report, actionHeader);
@@ -327,14 +338,23 @@ public abstract class GenericGeneratorReporter extends
 	 * 
 	 * @return
 	 */
-	protected JasperReportBuilder setTemplateReport(JasperReportBuilder report, String pathTemplate) {
+	@SuppressWarnings("deprecation")
+	protected JasperReportBuilder setTemplateReport(JasperReportBuilder report,
+			String pathTemplate, String sql) {
 		try {
+			Connection connection = ((SessionFactoryImplementor) this
+					.getPersistence().getSession().getSessionFactory())
+					.getConnectionProvider().getConnection();
+//			report.setConnection(connection);
+			report.setDataSource(sql, connection);
 			report.setTemplateDesign(pathTemplate);
 		} catch (DRException e) {
 			e.printStackTrace();
 			new ExceptionManager(e).treatException();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-		
+
 		return report;
 	}
 
@@ -342,7 +362,8 @@ public abstract class GenericGeneratorReporter extends
 	 * Método que seta o cabeçalho para o relatório, sobrescrevê-lo para setar
 	 * um cabeçalho.
 	 */
-	protected JasperReportBuilder getHeaderReport(JasperReportBuilder report, String actionHeader) {
+	protected JasperReportBuilder getHeaderReport(JasperReportBuilder report,
+			String actionHeader) {
 		Return ret = new Return(true);
 		data.put("report", report);
 		ret.concat(doAction(actionHeader, false));
@@ -353,7 +374,8 @@ public abstract class GenericGeneratorReporter extends
 	 * Método que seta o rodapé no relatório, sobrescrevê-lo para setar um
 	 * rodapé.
 	 */
-	protected JasperReportBuilder getFooterReport(JasperReportBuilder report, String actionFooter) {
+	protected JasperReportBuilder getFooterReport(JasperReportBuilder report,
+			String actionFooter) {
 		Return ret = new Return(true);
 		data.put("report", report);
 		ret.concat(doAction(actionFooter, false));
@@ -364,7 +386,8 @@ public abstract class GenericGeneratorReporter extends
 	 * Método que seta o Título no relatório, de acordo com o que for
 	 * implementado, bastanto sobrescrevê-lo
 	 */
-	protected JasperReportBuilder getTitleReport(JasperReportBuilder report, String actionTitle) {
+	protected JasperReportBuilder getTitleReport(JasperReportBuilder report,
+			String actionTitle) {
 		Return ret = new Return(true);
 		data.put("report", report);
 		ret.concat(doAction(actionTitle, false));
