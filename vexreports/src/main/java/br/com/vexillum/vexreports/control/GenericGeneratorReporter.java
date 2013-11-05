@@ -1,5 +1,6 @@
 package br.com.vexillum.vexreports.control;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -10,13 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
-
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.jasper.builder.export.ExporterBuilders;
 import net.sf.dynamicreports.jasper.builder.export.JasperPdfExporterBuilder;
 import net.sf.dynamicreports.report.base.DRReportTemplate;
-import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.ReportTemplateBuilder;
 import net.sf.dynamicreports.report.builder.column.Columns;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilder;
@@ -26,6 +24,10 @@ import net.sf.dynamicreports.report.builder.style.StyleBuilders;
 import net.sf.dynamicreports.report.constant.HorizontalAlignment;
 import net.sf.dynamicreports.report.constant.VerticalAlignment;
 import net.sf.dynamicreports.report.exception.DRException;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.JRPdfExporterParameter;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -106,7 +108,7 @@ public abstract class GenericGeneratorReporter extends
 	/**
 	 * Output Stream para devolver o relatório para o ZK
 	 */
-	protected ServletOutputStream outputStream;// Não usado ainda
+	protected ByteArrayInputStream outputStream;// Não usado ainda
 
 	/**
 	 * Construtores de Estilos
@@ -165,7 +167,7 @@ public abstract class GenericGeneratorReporter extends
 		params = (Map) data.get("params");
 
 		// TODO Ainda não está sendo usado
-		outputStream = (ServletOutputStream) data.get("outputStream");
+		outputStream = (ByteArrayInputStream) data.get("outputStream");
 
 		pathTemplate = (String) data.get("pathTemplate");
 
@@ -221,27 +223,38 @@ public abstract class GenericGeneratorReporter extends
 		try {
 			report = buildReport();
 
-			// report.show(); Funciona somente para Java Application
-
-			ExporterBuilders export = new ExporterBuilders();
-			JasperPdfExporterBuilder pdfExporter = export
-					.pdfExporter("D:/Reports TESTE/certos/report.pdf");
+//			ExporterBuilders export = new ExporterBuilders();
+			
+			JRPdfExporter exporter = new JRPdfExporter();
+			
+//			JasperPdfExporterBuilder pdfExporter = export
+//					.pdfExporter("D:/Reports TESTE/certos/report.pdf");
 
 			// JasperHtmlExporterBuilder htmlExporterBuilder =
 			// export.htmlExporter(outputStream);
 
 			// report.toHtml(htmlExporterBuilder);
 
-			report.toPdf(pdfExporter);
+//			report.toPdf(pdfExporter);
+			
+			exporter.setParameter(JRExporterParameter.JASPER_PRINT,
+					report.getReport());
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM,
+					outputStream);
+			exporter.setParameter(
+					JRPdfExporterParameter.IS_CREATING_BATCH_MODE_BOOKMARKS,
+					Boolean.TRUE);
 
+			exporter.exportReport();
+			
 		} catch (NullPointerException e) {
 			ret.setValid(false);
 			e = new NullPointerException(
 					"As lista do relatório não pode ser nulla, listReport");
 			new ExceptionManager(e).treatException();
-		} catch (DRException e) {
-			ret.setValid(false);
-			new ExceptionManager(e).treatException();
+		} catch (JRException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return ret;
 	}
