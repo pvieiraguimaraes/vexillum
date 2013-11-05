@@ -1,19 +1,15 @@
 package br.com.vexillum.vexreports.view;
 
-import java.io.IOException;
-import java.util.Hashtable;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.annotation.Scope;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
+import org.zkoss.zul.Filedownload;
 
 import br.com.vexillum.control.GenericControl;
-import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.Return;
@@ -36,29 +32,32 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	private boolean withHeader = true;
 
 	private boolean withFooter = true;
-	
+
 	private boolean withTitle = true;
 
 	private Map<String, String> mapFieldsName;
 
 	private boolean followAnnotation = true;
 
-	private boolean concatenatedReports = false; //TODO Não está sendo usado por enquanto
+	private boolean concatenatedReports = false; // TODO Não está sendo usado
+													// por enquanto
 
 	private Map params;
 
-	private ServletOutputStream outputStream;
-	
 	private String titleReport;
-	
+
 	private String pathTemplate;
+
+	private ByteArrayOutputStream outputStream;
 	
-	public ServletOutputStream getOutputStream() {
-		return outputStream;
+	private String nameReport;
+	
+	public String getNameReport() {
+		return nameReport;
 	}
 
-	public void setOutputStream(ServletOutputStream outputStream) {
-		this.outputStream = outputStream;
+	public void setNameReport(String nameReport) {
+		this.nameReport = nameReport;
 	}
 
 	public boolean getConcatenatedReports() {
@@ -140,7 +139,7 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	public void setWithTitle(boolean withTitle) {
 		this.withTitle = withTitle;
 	}
-	
+
 	public String getTitleReport() {
 		return titleReport;
 	}
@@ -160,7 +159,8 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		// getOutputStreamZK();
+		if (outputStream == null)
+			outputStream = new ByteArrayOutputStream();
 	}
 
 	/**
@@ -170,9 +170,10 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	 */
 	public GenericGeneratorReporter getGeneratorReport() {
 		return SpringFactory.getController("genericGeneratorReporter",
-				GenericGeneratorReporter.class,	ReflectionUtils.prepareDataForPersistence(this));
+				GenericGeneratorReporter.class,
+				ReflectionUtils.prepareDataForPersistence(this));
 	}
-	
+
 	public Return generateListEntityReport() {
 		Return ret = new Return(true);
 		ret.concat(generateReport(getListEntity()));
@@ -181,59 +182,41 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 
 	public Return generateReport() {
 		Return ret = new Return(true);
-		
-		if(params != null || !params.isEmpty())
+
+		if (params != null || !params.isEmpty()){
 			ret.concat(getGeneratorReport().doAction("generateReport"));
+			showReport();
+		}
 		else {
 			ret.setValid(false);
 			String msg = "O Map params não pode ser nulo";
 			throw new NullPointerException(msg);
-			//TODO Tratar como para disparar uma mensagem de excption..
+			// TODO Tratar como para disparar uma mensagem de excption..
 		}
 		return ret;
-	}
-
-	// TODO Não será tão fácil assim mandar para a visão
-	private void getOutputStreamZK() {
-		try {
-			ServletOutputStream outputStream = ((HttpServletResponse) Executions
-					.getCurrent().getNativeResponse()).getOutputStream();
-			setOutputStream(outputStream);
-		} catch (IOException e) {
-			e.printStackTrace();
-			new ExceptionManager(e).treatException();
-		}
 	}
 
 	@SuppressWarnings({ "unchecked", "null" })
 	public Return generateReport(List list) {
 		Return ret = new Return(true);
-		
+
 		if (list != null || !list.isEmpty())
 			setListReport(list);
 		else {
 			ret.setValid(false);
 			String msg = "A lista não pode ser nula";
 			throw new NullPointerException(msg);
-			//TODO Tratar como para disparar uma mensagem de excption..
+			// TODO Tratar como para disparar uma mensagem de excption..
 		}
-		
+
 		ret.concat(getGeneratorReport().doAction("generateReport"));
-		
+		showReport();
 		return ret;
 	}
 
 	public void showReport() {
-		Hashtable h = new Hashtable();
-		h.put("Path", "/var/temp/");
-		h.put("File", "test.pdf");
-		
-		String pathClass = this.getClass().getResource("").getFile();
-		String pathApplication = pathClass.substring(0,
-				pathClass.indexOf("WEB-INF"));
-		
-		Executions.getCurrent().createComponents(
-				"/template/reportView.zul",null, h);
-	}
+		Filedownload.save(new ByteArrayInputStream(outputStream.toByteArray()),
+				"application/pdf", getNameReport());
 
+	}
 }
