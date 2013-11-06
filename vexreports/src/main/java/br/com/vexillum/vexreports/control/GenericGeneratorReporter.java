@@ -1,6 +1,6 @@
 package br.com.vexillum.vexreports.control;
 
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
-import net.sf.dynamicreports.jasper.builder.export.ExporterBuilders;
-import net.sf.dynamicreports.jasper.builder.export.JasperPdfExporterBuilder;
 import net.sf.dynamicreports.report.base.DRReportTemplate;
 import net.sf.dynamicreports.report.builder.ReportTemplateBuilder;
 import net.sf.dynamicreports.report.builder.column.Columns;
@@ -106,11 +104,6 @@ public abstract class GenericGeneratorReporter extends
 	protected StyleBuilders styleBuider;
 
 	/**
-	 * Output Stream para devolver o relatório para o ZK
-	 */
-	protected ByteArrayInputStream outputStream;// Não usado ainda
-
-	/**
 	 * Construtores de Estilos
 	 */
 	protected StyleBuilder columnTitleStyle;
@@ -134,6 +127,14 @@ public abstract class GenericGeneratorReporter extends
 
 	protected DRReportTemplate templateReport;
 
+	public Properties getReportConfig() {
+		return reportConfig;
+	}
+	
+	public void setReportConfig(Properties reportConfig) {
+		this.reportConfig = reportConfig;
+	}
+
 	public GenericGeneratorReporter() {
 		super(null);
 		report = new JasperReportBuilder();
@@ -147,6 +148,7 @@ public abstract class GenericGeneratorReporter extends
 			reportConfig = null;
 		}
 	}
+
 
 	@SuppressWarnings("unchecked")
 	private void initReport() {
@@ -165,9 +167,6 @@ public abstract class GenericGeneratorReporter extends
 		mapFieldsName = (Map<String, String>) data.get("mapFieldsName");
 
 		params = (Map) data.get("params");
-
-		// TODO Ainda não está sendo usado
-		outputStream = (ByteArrayInputStream) data.get("outputStream");
 
 		pathTemplate = (String) data.get("pathTemplate");
 
@@ -218,8 +217,7 @@ public abstract class GenericGeneratorReporter extends
 		return report;
 	}
 
-	public Return doReport() {
-		Return ret = new Return(true);
+	public ByteArrayOutputStream doReport() {
 		try {
 			report = buildReport();
 
@@ -237,8 +235,10 @@ public abstract class GenericGeneratorReporter extends
 
 //			report.toPdf(pdfExporter);
 			
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT,
-					report.getReport());
+					report.toJasperPrint());
 			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM,
 					outputStream);
 			exporter.setParameter(
@@ -247,16 +247,17 @@ public abstract class GenericGeneratorReporter extends
 
 			exporter.exportReport();
 			
+			return outputStream;
 		} catch (NullPointerException e) {
-			ret.setValid(false);
 			e = new NullPointerException(
 					"As lista do relatório não pode ser nulla, listReport");
 			new ExceptionManager(e).treatException();
 		} catch (JRException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DRException e) {
 			e.printStackTrace();
 		}
-		return ret;
+		return null;
 	}
 
 	/**
@@ -329,10 +330,7 @@ public abstract class GenericGeneratorReporter extends
 		return report.addColumn(Columns
 				.column(nameCollum, item, classField)
 				.setWidth(getColumnWidth(classField))
-				.setStyle(
-						styleBuider.style().setAlignment(
-								HorizontalAlignment.CENTER,
-								VerticalAlignment.JUSTIFIED)));
+				.setStyle(styleBuider.style().setAlignment(HorizontalAlignment.CENTER,VerticalAlignment.JUSTIFIED)));
 	}
 
 	private Class getClassField(String nameField) {
@@ -414,13 +412,9 @@ public abstract class GenericGeneratorReporter extends
 	 */
 	protected abstract JasperReportBuilder buildReport();
 
-	public Return generateReport() {
+	public ByteArrayOutputStream generateReport() {
 		initReport();
-
-		Return ret = new Return(true);
-		ret.concat(doReport());
-
-		return ret;
+		return doReport();
 	}
 
 	/**
