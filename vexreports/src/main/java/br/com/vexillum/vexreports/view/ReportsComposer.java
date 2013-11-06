@@ -39,9 +39,6 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 
 	private boolean followAnnotation = true;
 
-	private boolean concatenatedReports = false; // TODO Não está sendo usado
-													// por enquanto
-
 	private Map params;
 
 	private String titleReport;
@@ -52,20 +49,20 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 	
 	private String nameReport;
 	
+	public ByteArrayOutputStream getOutputStream() {
+		return outputStream;
+	}
+
+	public void setOutputStream(ByteArrayOutputStream outputStream) {
+		this.outputStream = outputStream;
+	}
+
 	public String getNameReport() {
 		return nameReport;
 	}
 
 	public void setNameReport(String nameReport) {
 		this.nameReport = nameReport;
-	}
-
-	public boolean getConcatenatedReports() {
-		return concatenatedReports;
-	}
-
-	public void setConcatenatedReports(boolean concatenatedReports) {
-		this.concatenatedReports = concatenatedReports;
 	}
 
 	public Map<String, String> getMapFieldsName() {
@@ -184,14 +181,13 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		Return ret = new Return(true);
 
 		if (params != null || !params.isEmpty()){
-			ret.concat(getGeneratorReport().doAction("generateReport"));
+			setOutputStream(getGeneratorReport().generateReport());
 			showReport();
 		}
 		else {
 			ret.setValid(false);
 			String msg = "O Map params não pode ser nulo";
 			throw new NullPointerException(msg);
-			// TODO Tratar como para disparar uma mensagem de excption..
 		}
 		return ret;
 	}
@@ -206,10 +202,9 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 			ret.setValid(false);
 			String msg = "A lista não pode ser nula";
 			throw new NullPointerException(msg);
-			// TODO Tratar como para disparar uma mensagem de excption..
 		}
 
-		ret.concat(getGeneratorReport().doAction("generateReport"));
+		setOutputStream(getGeneratorReport().generateReport());
 		showReport();
 		return ret;
 	}
