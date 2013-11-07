@@ -12,7 +12,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<zkversion>6.5.2</zkversion>
+		<zkversion>6.5.4</zkversion>
 		<compiler.version>1.7</compiler.version>
 		<aspectj.version>1.7.2</aspectj.version>
 		<spring.version>3.2.3.RELEASE</spring.version>

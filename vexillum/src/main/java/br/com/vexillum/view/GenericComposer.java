@@ -211,17 +211,13 @@ public class GenericComposer<U extends UserBasic> extends
 				Clients.showNotification(
 						message.getMessage(),
 						type,
-						getComponentById(
-								component,
-								"fld"
-										+ StringUtils.capitalize(message
-												.getAssociated())),
-						"end_center", 0, true);
+						getComponentById(component,	"fld" + StringUtils.capitalize(message.getAssociated())),
+						"end_center", 0, false);
 			}
 		}
 		if (!geralMessage.equals("")) {
 			Clients.showNotification(geralMessage, type, null, "middle_center",
-					0, true);
+					0, false);
 		}
 	}
 
