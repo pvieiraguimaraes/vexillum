@@ -199,7 +199,7 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		return persistence.save(entity);
 	}
 	
-	protected Return update(E entity){
+	protected Return update(ICommonEntity entity){
 		return persistence.update(entity);
 	}
 	
