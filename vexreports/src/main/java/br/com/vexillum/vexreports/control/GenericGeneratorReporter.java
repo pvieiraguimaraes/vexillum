@@ -233,10 +233,12 @@ public abstract class GenericGeneratorReporter extends
 
 			// report.toHtml(htmlExporterBuilder);
 
-//			report.toPdf(pdfExporter);
+//			report.toPdf(new FileOutputStream("D:/report.pdf"));
 			
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			
+//			JasperPrint print = JasperFillManager.fillReport(pathTemplate, params, report.getDataSource());
+//			report.toJasperPrint();
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT,
 					report.toJasperPrint());
 			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM,
@@ -250,7 +252,7 @@ public abstract class GenericGeneratorReporter extends
 			return outputStream;
 		} catch (NullPointerException e) {
 			e = new NullPointerException(
-					"As lista do relatório não pode ser nulla, listReport");
+					"As lista do relatório não pode ser nula, listReport");
 			new ExceptionManager(e).treatException();
 		} catch (JRException e) {
 			e.printStackTrace();
