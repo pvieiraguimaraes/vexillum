@@ -202,8 +202,13 @@ public abstract class GenericGeneratorReporter extends
 		if (listItens.length != 0 && !mapFieldsName.isEmpty())
 			report = createColluns(listItens, mapFieldsName, report);
 
-		if (subReportTemplate)
-			report = setTemplateReport(report, pathTemplate, sql);
+		if (subReportTemplate){
+			if(dataSource != null && !dataSource.isEmpty()){
+				report = setTemplateReport(report, pathTemplate, null, dataSource);
+			} else {
+				report = setTemplateReport(report, pathTemplate, sql, null);
+			}
+		}
 
 		if (subReportHeader)
 			report = getHeaderReport(report, actionHeader);
@@ -213,7 +218,7 @@ public abstract class GenericGeneratorReporter extends
 
 		if (subReportTitle)
 			report = getTitleReport(report, actionTitle);
-
+		
 		return report;
 	}
 
@@ -239,6 +244,7 @@ public abstract class GenericGeneratorReporter extends
 			
 //			JasperPrint print = JasperFillManager.fillReport(pathTemplate, params, report.getDataSource());
 //			report.toJasperPrint();
+			
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT,
 					report.toJasperPrint());
 			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM,
@@ -353,13 +359,16 @@ public abstract class GenericGeneratorReporter extends
 	 */
 	@SuppressWarnings("deprecation")
 	protected JasperReportBuilder setTemplateReport(JasperReportBuilder report,
-			String pathTemplate, String sql) {
+			String pathTemplate, String sql, Collection<?> dataSource) {
 		try {
-			Connection connection = ((SessionFactoryImplementor) this
-					.getPersistence().getSession().getSessionFactory())
-					.getConnectionProvider().getConnection();
-//			report.setConnection(connection);
-			report.setDataSource(sql, connection);
+			if(dataSource != null && !dataSource.isEmpty()){
+				report.setDataSource(dataSource);
+			} else {
+				Connection connection = ((SessionFactoryImplementor) this
+						.getPersistence().getSession().getSessionFactory())
+						.getConnectionProvider().getConnection();
+				report.setDataSource(sql, connection);
+			}
 			report.setTemplateDesign(pathTemplate);
 		} catch (DRException e) {
 			e.printStackTrace();
