@@ -23,7 +23,7 @@ import br.com.vexillum.view.CRUDComposer;
 public abstract class ReportsComposer<E extends ICommonEntity, G extends GenericControl<E>>
 		extends CRUDComposer<E, G> {
 
-	private List<E> listReport;
+	private List<?> listReport;
 
 	private String[] listItens;
 
@@ -97,11 +97,11 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		this.listItens = listItens;
 	}
 
-	public List<E> getListReport() {
+	public List<?> getListReport() {
 		return listReport;
 	}
 
-	public void setListReport(List<E> listReport) {
+	public void setListReport(List<?> listReport) {
 		this.listReport = listReport;
 	}
 
@@ -192,7 +192,7 @@ public abstract class ReportsComposer<E extends ICommonEntity, G extends Generic
 		return ret;
 	}
 
-	@SuppressWarnings({ "unchecked", "null" })
+	@SuppressWarnings({  "null" })
 	public Return generateReport(List list) {
 		Return ret = new Return(true);
 
