@@ -11,6 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import br.com.vexillum.control.UserBasicControl;
 import br.com.vexillum.model.Category;
 import br.com.vexillum.model.UserBasic;
+import br.com.vexillum.util.EncryptUtils;
 import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.SpringFactory;
 
@@ -32,7 +33,7 @@ public class AuthenticatorProvider<U extends UserBasic> implements
 		UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) auth;
 		String userName = token.getName();
 		String password = token.getCredentials() != null ? token.getCredentials().toString() : null;
-		U user = (U) control.getUser(userName, password);
+		U user = (U) control.getUser(userName, EncryptUtils.encryptOnSHA512(password));
 		if (user == null)
 			return null;
 		//TODO Tratar permissoes depois sem ser como categoria
