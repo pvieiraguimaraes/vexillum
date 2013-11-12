@@ -83,8 +83,8 @@ public class FilteredSearchComposer extends CRUDComposer {
 	
 	public void initFilteredBinder(){
 		binder.bindBean("entity", getEntity());
-		binder.addBinding(component, "selectedItem", "entity." + getBindIn());
-		binder.addBinding(component, "value", "entity." + getBindIn(), new String[]{"self.onChange"}, "none", "load", null);
+		binder.addBinding(getComponent(), "selectedItem", "entity." + getBindIn());
+		binder.addBinding(getComponent(), "value", "entity." + getBindIn(), new String[]{"self.onChange"}, "none", "load", null);
 		loadBinder();
 	}
 

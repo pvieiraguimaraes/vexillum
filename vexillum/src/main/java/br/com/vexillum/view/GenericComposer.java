@@ -64,8 +64,8 @@ public class GenericComposer<U extends UserBasic> extends
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		comp.setAttribute("controller", this);
-		this.component = comp;
-		initBinder(component);
+		this.setComponent(comp);
+		initBinder(getComponent());
 		setUserLogged((U) getUserInSession());
 		try {
 			messages =  SpringFactory.getInstance().getBean("messagesProperties", Properties.class);
@@ -143,7 +143,7 @@ public class GenericComposer<U extends UserBasic> extends
 	}
 	
 	public Component getComponentById(String id) {
-		return getComponentById(component, id);
+		return getComponentById(getComponent(), id);
 	}
 
 	public Component getComponentByType(Component comp, String type) {
@@ -211,7 +211,7 @@ public class GenericComposer<U extends UserBasic> extends
 				Clients.showNotification(
 						message.getMessage(),
 						type,
-						getComponentById(component,	"fld" + StringUtils.capitalize(message.getAssociated())),
+						getComponentById(getComponent(),	"fld" + StringUtils.capitalize(message.getAssociated())),
 						"end_center", 0, false);
 			}
 		}
@@ -323,5 +323,13 @@ public class GenericComposer<U extends UserBasic> extends
 		};
 		Messagebox.show(messageQuestion, "Confirmação", Messagebox.YES | Messagebox.NO,
 				Messagebox.QUESTION, evt);
+	}
+
+	public Component getComponent() {
+		return component;
+	}
+
+	public void setComponent(Component component) {
+		this.component = component;
 	}
 }
