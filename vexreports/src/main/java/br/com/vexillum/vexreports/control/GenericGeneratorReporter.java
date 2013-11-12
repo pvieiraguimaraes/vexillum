@@ -152,23 +152,23 @@ public abstract class GenericGeneratorReporter extends
 
 	@SuppressWarnings("unchecked")
 	private void initReport() {
-		listReport = (List<CommonEntity>) data.get("listReport");
+		listReport = (List<CommonEntity>) (data.get("listReport") == null ? null : data.get("listReport"));
 
-		titleReport = (String) data.get("titleReport");
+		titleReport = (String) (data.get("titleReport") == null ? "" : data.get("titleReport"));
 
-		withTemplate = (Boolean) data.get("withTemplate");
-		withHeader = (Boolean) data.get("withHeader");
-		withFooter = (Boolean) data.get("withFooter");
-		withTitle = (Boolean) data.get("withTitle");
+		withTemplate = (Boolean) (data.get("withTemplate") == null ? true : data.get("withTemplate"));
+		withHeader = (Boolean) (data.get("withHeader") == null ? true : data.get("withHeader"));
+		withFooter = (Boolean) (data.get("withFooter") == null ? true : data.get("withFooter"));
+		withTitle = (Boolean) (data.get("withTitle") == null ? true : data.get("withTitle"));
 
-		followAnnotation = (Boolean) data.get("followAnnotation");
+		followAnnotation = (Boolean) (data.get("followAnnotation") == null ? true : data.get("followAnnotation"));
 
-		listItens = (String[]) data.get("listItens");
-		mapFieldsName = (Map<String, String>) data.get("mapFieldsName");
+		listItens = (String[]) (data.get("listItens") == null ? null : data.get("listItens"));
+		mapFieldsName = (Map<String, String>) (data.get("mapFieldsName") == null ? null : data.get("mapFieldsName"));
 
-		params = (Map) data.get("params");
+		params = (Map) (data.get("params") == null ? null : data.get("params"));
 
-		pathTemplate = (String) data.get("pathTemplate");
+		pathTemplate = (String) (data.get("pathTemplate") == null ? "" : data.get("pathTemplate"));
 
 		initEntities();
 	}
