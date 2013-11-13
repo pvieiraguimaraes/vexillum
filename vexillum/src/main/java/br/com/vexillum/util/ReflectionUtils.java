@@ -100,8 +100,12 @@ public class ReflectionUtils {
 
 	@SuppressWarnings("rawtypes")
 	public static Class getGenericType(Object object) {
-		return (Class) ((ParameterizedType) object.getClass()
-				.getGenericSuperclass()).getActualTypeArguments()[0];
+		return getGenericType(object.getClass());
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static Class getGenericType(Class object) {
+		return (Class) ((ParameterizedType) object.getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
 	public static List<Field> getSearchFieldsNotNull(ICommonEntity entity)
