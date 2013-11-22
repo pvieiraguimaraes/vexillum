@@ -215,6 +215,10 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		getPersistence().getSession().refresh(entity);
 	}
 	
+	public void merge(ICommonEntity entity){
+		getPersistence().getSession().merge(entity);
+	}
+	
 	public Return deactivate(){
 		if(!(entity instanceof IActivatedEntity))
 			throw new IllegalArgumentException("Entidade Inválida. A mesma de ver herdar da interface IActivatedEntity!");
