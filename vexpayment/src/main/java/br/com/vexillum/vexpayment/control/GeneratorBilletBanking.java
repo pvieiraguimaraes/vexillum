@@ -1,38 +1,49 @@
 package br.com.vexillum.vexpayment.control;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.jrimum.bopepo.Boleto;
+import org.jrimum.bopepo.view.BoletoViewer;
 import org.jrimum.domkee.financeiro.banco.ParametrosBancariosMap;
+import org.jrimum.domkee.financeiro.banco.febraban.Agencia;
+import org.jrimum.domkee.financeiro.banco.febraban.Banco;
 import org.jrimum.domkee.financeiro.banco.febraban.Cedente;
+import org.jrimum.domkee.financeiro.banco.febraban.CodigoDeCompensacaoBACEN;
 import org.jrimum.domkee.financeiro.banco.febraban.ContaBancaria;
+import org.jrimum.domkee.financeiro.banco.febraban.NumeroDaConta;
 import org.jrimum.domkee.financeiro.banco.febraban.Sacado;
 import org.jrimum.domkee.financeiro.banco.febraban.TipoDeTitulo;
 import org.jrimum.domkee.financeiro.banco.febraban.Titulo;
 
-import br.com.vexillum.configuration.Properties;
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
-import br.com.vexillum.util.Return;
 import br.com.vexillum.vexpayment.model.BilletBanking;
 
 public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 
-	private Properties billetProperties;
-
-	private DecimalFormat formaterDouble;
-	private SimpleDateFormat formaterData;
-
-	// private Date dateAfter;
-
 	public GeneratorBilletBanking() {
 		super(null);
+	}
+	
+	public byte[] generateBillet(BilletBanking billet){
+		
+		return null;
+	}
+	
+	public byte[] generateSeveralBillets(List<BilletBanking> billets){
+		List<Boleto> boletosJrimum = constructSeveralBillets(billets);
+		return null;
+	}
+	
+	private BoletoViewer createTemplateBoleto(Boleto boleto, String pathTemplate){
+		File template = new File(pathTemplate);
+		return new BoletoViewer(boleto, template);		
 	}
 
 	private List<Boleto> constructSeveralBillets(List<BilletBanking> billets) {
@@ -51,7 +62,11 @@ public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 
 	private Boleto overrideInformations(Boleto boleto,
 			HashMap<String, String> params) {
-		return null;
+		Set<String> keySet = params.keySet();
+		for (String key : keySet) {
+			boleto.addTextosExtras(key, params.get(key));
+		}
+		return boleto;
 	}
 
 	private Boleto putGeneralInstructionsInBillet(Boleto boleto,
@@ -77,7 +92,7 @@ public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 	}
 
 	private Titulo getTitleBillet(BilletBanking billet) {
-		Titulo titulo = new Titulo(getContaBancaria(), getSacado(),
+		Titulo titulo = new Titulo(getContaBancaria(billet), getSacado(billet),
 				getCedente(billet));
 		titulo.setParametrosBancarios(getParamentrosBancarios());
 		titulo.setAceite(null);
@@ -149,14 +164,32 @@ public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 		return new Cedente(billet.getNameCedente(), billet.getCgcCedente());
 	}
 
-	private Sacado getSacado() {
-		// TODO Auto-generated method stub
-		return null;
+	private Sacado getSacado(BilletBanking billet) {
+		Sacado sacado = new Sacado(billet.getNameSacado(),
+				billet.getCgcSacado());
+		sacado.setEnderecos(billet.getEnderecos());
+		return sacado;
 	}
 
-	private ContaBancaria getContaBancaria() {
-		// TODO Auto-generated method stub
-		return null;
+	private ContaBancaria getContaBancaria(BilletBanking billet) {
+		ContaBancaria contaBancaria = new ContaBancaria();
+		contaBancaria.setAgencia(getAgencia(billet));
+		contaBancaria.setBanco(getBanco(billet));
+		contaBancaria.setNumeroDaConta(getNumeroDaConta(billet));
+		return contaBancaria;
+	}
+
+	private NumeroDaConta getNumeroDaConta(BilletBanking billet) {
+		return new NumeroDaConta(billet.getNumberAccount(), billet.getDigityAccount());
+	}
+
+	private Banco getBanco(BilletBanking billet) {
+		CodigoDeCompensacaoBACEN codigoBACEN = new CodigoDeCompensacaoBACEN(billet.getCodeBank());
+		return new Banco(codigoBACEN, billet.getNameBank());
+	}
+
+	private Agencia getAgencia(BilletBanking billet) {
+		return new Agencia(billet.getAgencyCode(), billet.getAgencyDigit());
 	}
 
 }

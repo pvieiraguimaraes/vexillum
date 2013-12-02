@@ -1,10 +1,18 @@
 package br.com.vexillum.vexpayment.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+
+import org.jrimum.domkee.comum.pessoa.endereco.Endereco;
 
 import br.com.vexillum.model.CommonEntity;
 
+/**
+ * @author pedro.vieira
+ * 
+ */
 /**
  * @author pedro.vieira
  * 
@@ -21,10 +29,14 @@ public class BilletBanking extends CommonEntity {
 	private Double juros;
 	private String numberBillet;
 	private String numberDocument;
+
 	private boolean withJuros;
 
 	private String nameCedente;
 	private String cgcCedente;
+
+	private String nameSacado;
+	private String cgcSacado;
 
 	private String localePayment;
 	private String instructionForSacado;
@@ -41,7 +53,27 @@ public class BilletBanking extends CommonEntity {
 	 */
 	private HashMap<String, String> params;
 
+	private String templatePath;
+
+	private List<Endereco> enderecos;
+
+	private Integer agencyCode;
+	private String agencyDigit;
+
+	private String carteiraCode;
+
+	private Integer numberAccount;
+	private String digityAccount;
+
+	private String codeBank;
+	private String nameBank;
+
 	// TODO Verificar como será tratado o nome dos SACADO, ENDEREÇO e CEDENTE
+
+	public BilletBanking() {
+		if (enderecos == null)
+			enderecos = new ArrayList<Endereco>();
+	}
 
 	public String getMonthReference() {
 		return monthReference;
@@ -170,6 +202,94 @@ public class BilletBanking extends CommonEntity {
 
 	public void setParams(HashMap<String, String> params) {
 		this.params = params;
+	}
+
+	public String getTemplatePath() {
+		return templatePath;
+	}
+
+	public void setTemplatePath(String templatePath) {
+		this.templatePath = templatePath;
+	}
+
+	public List<Endereco> getEnderecos() {
+		return enderecos;
+	}
+
+	public void setEnderecos(List<Endereco> enderecos) {
+		this.enderecos = enderecos;
+	}
+
+	public String getNameSacado() {
+		return nameSacado;
+	}
+
+	public void setNameSacado(String nameSacado) {
+		this.nameSacado = nameSacado;
+	}
+
+	public String getCgcSacado() {
+		return cgcSacado;
+	}
+
+	public void setCgcSacado(String cgcSacado) {
+		this.cgcSacado = cgcSacado;
+	}
+
+	public Integer getAgencyCode() {
+		return agencyCode;
+	}
+
+	public void setAgencyCode(Integer agencyCode) {
+		this.agencyCode = agencyCode;
+	}
+
+	public String getAgencyDigit() {
+		return agencyDigit;
+	}
+
+	public void setAgencyDigit(String agencyDigit) {
+		this.agencyDigit = agencyDigit;
+	}
+
+	public String getCarteiraCode() {
+		return carteiraCode;
+	}
+
+	public void setCarteiraCode(String carteiraCode) {
+		this.carteiraCode = carteiraCode;
+	}
+
+	public Integer getNumberAccount() {
+		return numberAccount;
+	}
+
+	public void setNumberAccount(Integer numberAccount) {
+		this.numberAccount = numberAccount;
+	}
+
+	public String getDigityAccount() {
+		return digityAccount;
+	}
+
+	public void setDigityAccount(String digityAccount) {
+		this.digityAccount = digityAccount;
+	}
+
+	public String getCodeBank() {
+		return codeBank;
+	}
+
+	public void setCodeBank(String codeBank) {
+		this.codeBank = codeBank;
+	}
+
+	public String getNameBank() {
+		return nameBank;
+	}
+
+	public void setNameBank(String nameBank) {
+		this.nameBank = nameBank;
 	}
 
 }
