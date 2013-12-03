@@ -3,6 +3,7 @@ package br.com.vexillum.vexpayment.control;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,10 @@ public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 	}
 
 	private List<Boleto> constructSeveralBillets(List<BilletBanking> billets) {
+		List<Boleto> boletos = new ArrayList<Boleto>();
+		for (BilletBanking billetBanking : billets) {
+			
+		}
 		return null;
 	}
 
