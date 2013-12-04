@@ -1,6 +1,5 @@
 package br.com.vexillum.vexpayment.control;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,38 +20,40 @@ import org.jrimum.domkee.financeiro.banco.febraban.NumeroDaConta;
 import org.jrimum.domkee.financeiro.banco.febraban.Sacado;
 import org.jrimum.domkee.financeiro.banco.febraban.TipoDeTitulo;
 import org.jrimum.domkee.financeiro.banco.febraban.Titulo;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import br.com.vexillum.control.GenericControl;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.vexpayment.model.BilletBanking;
 
+@Service
+@Scope("prototype")
 public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
+	
+	private BoletoViewer boletoViewer;
 
 	public GeneratorBilletBanking() {
 		super(null);
 	}
 	
 	public byte[] generateBillet(BilletBanking billet){
-		
-		return null;
+		constructBillet(billet);
+		return boletoViewer.getPdfAsByteArray();
 	}
 	
-	public byte[] generateSeveralBillets(List<BilletBanking> billets){
+	@SuppressWarnings("static-access")
+	public byte[] generateSeveralBillets(List<BilletBanking> billets, String pathBoleto){
 		List<Boleto> boletosJrimum = constructSeveralBillets(billets);
-		return null;
-	}
-	
-	private BoletoViewer createTemplateBoleto(Boleto boleto, String pathTemplate){
-		File template = new File(pathTemplate);
-		return new BoletoViewer(boleto, template);		
+		return boletoViewer.groupInOnePdfWithTemplate(boletosJrimum, pathBoleto);
 	}
 
 	private List<Boleto> constructSeveralBillets(List<BilletBanking> billets) {
 		List<Boleto> boletos = new ArrayList<Boleto>();
 		for (BilletBanking billetBanking : billets) {
-			
+			boletos.add(constructBillet(billetBanking));
 		}
-		return null;
+		return boletos;
 	}
 
 	private Boleto constructBillet(BilletBanking billet) {
@@ -62,6 +63,7 @@ public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 		boleto = putGeneralInstructionsInBillet(boleto,
 				billet.getGeneralInstructions());
 		boleto = overrideInformations(boleto, billet.getParams());
+		boletoViewer = new BoletoViewer(boleto, billet.getTemplatePath());
 		return boleto;
 	}
 
@@ -103,9 +105,9 @@ public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 		titulo.setAceite(null);
 		titulo.setDataDoDocumento(billet.getEmissionDate());
 		titulo.setDataDoVencimento(getDateMaturity(billet.getMaturityDate()));
-		titulo.setNossoNumero(getOurTitleNumber());
-		titulo.setDigitoDoNossoNumero(getCheckDigitOurTitleNumber());
-		titulo.setNumeroDoDocumento(getNumberDocumentTitle());
+		titulo.setNossoNumero(getOurTitleNumber(billet));
+		titulo.setDigitoDoNossoNumero(getCheckDigitOurTitleNumber(billet));
+		titulo.setNumeroDoDocumento(getNumberDocumentTitle(billet));
 		titulo.setValor(getValueBillet(billet));
 		titulo.setTipoDeDocumento(getTypeDocBoleto());
 		return titulo;
@@ -131,15 +133,15 @@ public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 	 * 
 	 * @return
 	 */
-	protected String getOurTitleNumber() {
-		return null;
+	protected String getOurTitleNumber(BilletBanking billet) {
+		return billet.getOurTitleNumber();
 	}
 
 	/**
 	 * @return Só serve para impressão, não aparece na linha digitável e no cód.
 	 *         barras
 	 */
-	protected String getCheckDigitOurTitleNumber() {
+	protected String getCheckDigitOurTitleNumber(BilletBanking billet) {
 		return null;
 	}
 
@@ -148,8 +150,8 @@ public class GeneratorBilletBanking extends GenericControl<BilletBanking> {
 	 *         sobre ele exceto na maneira de ser impresso, que pode variar de
 	 *         banco pra banco.
 	 */
-	protected String getNumberDocumentTitle() {
-		return null;
+	protected String getNumberDocumentTitle(BilletBanking billet) {
+		return billet.getNumberBillet();
 	}
 
 	private Date getDateMaturity(Date maturityDate) {

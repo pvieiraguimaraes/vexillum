@@ -27,10 +27,12 @@ public class BilletBanking extends CommonEntity {
 	private Date periodFinal;
 	private Double value;
 	private Double juros;
-	private String numberBillet;
-	private String numberDocument;
 
 	private boolean withJuros;
+
+	private String numberBillet;
+	private String numberDocument;
+	private String ourTitleNumber;
 
 	private String nameCedente;
 	private String cgcCedente;
@@ -67,8 +69,6 @@ public class BilletBanking extends CommonEntity {
 
 	private String codeBank;
 	private String nameBank;
-
-	// TODO Verificar como será tratado o nome dos SACADO, ENDEREÇO e CEDENTE
 
 	public BilletBanking() {
 		if (enderecos == null)
@@ -290,6 +290,14 @@ public class BilletBanking extends CommonEntity {
 
 	public void setNameBank(String nameBank) {
 		this.nameBank = nameBank;
+	}
+
+	public String getOurTitleNumber() {
+		return ourTitleNumber;
+	}
+
+	public void setOurTitleNumber(String ourTitleNumber) {
+		this.ourTitleNumber = ourTitleNumber;
 	}
 
 }
