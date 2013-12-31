@@ -58,4 +58,8 @@ public class Friendship extends CommonEntityActivated {
 		this.dateFriendship = dateFriendship;
 	}
 
+	@Override
+	public String toString() {
+		return getFriend().getEmail();
+	}
 }
