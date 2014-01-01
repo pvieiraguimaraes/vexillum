@@ -199,11 +199,11 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 		return persistence.save(entity);
 	}
 	
-	protected Return update(ICommonEntity entity){
+	public Return update(E entity){
 		return persistence.update(entity);
 	}
 	
-	protected Return delete(E entity){
+	public Return delete(E entity){
 		return persistence.delete(entity);
 	}
 	
@@ -213,10 +213,6 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	
 	public void refresh(ICommonEntity entity){
 		getPersistence().getSession().refresh(entity);
-	}
-	
-	public void merge(ICommonEntity entity){
-		getPersistence().getSession().merge(entity);
 	}
 	
 	public Return deactivate(){
