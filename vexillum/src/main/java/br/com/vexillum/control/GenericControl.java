@@ -124,7 +124,7 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 			} 
 			if(ret.isValid()){
 				commitTransaction(transactionControlled);
-				ret.addMessage(getActionMessage(ret, action));
+				ret.addMessage(getActionMessage(ret, (String) getData().get("action")));
 			} else {
 				rollbackTransaction(transactionControlled);
 			}
