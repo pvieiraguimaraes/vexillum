@@ -26,6 +26,8 @@ public class FilteredSearch extends HtmlMacroComponent {
 	private String listSize;
 	
 	private String criterias;
+	
+	private String disabled = "false";
 
 	public ICommonEntity getTargetEntity() {
 		return targetEntity;
@@ -70,6 +72,14 @@ public class FilteredSearch extends HtmlMacroComponent {
 		this.criterias = criterias;
 		getComposer().setCriterias(criterias);
 	}
+	
+	public String getDisabled() {
+		return disabled;
+	}
+
+	public void setDisabled(String disabled) {
+		this.disabled = disabled;
+	}
 
 	@SuppressWarnings({ "unchecked" })
 	private void initBinder() {
@@ -78,6 +88,7 @@ public class FilteredSearch extends HtmlMacroComponent {
 			composer.setEntity(targetEntity);
 			composer.setBindIn(bindIn);
 			composer.initFilteredBinder();
+			
 		}
 	}
 	
@@ -88,6 +99,7 @@ public class FilteredSearch extends HtmlMacroComponent {
 	public FilteredSearch() {
 		super.compose();
 		cmbFilteredSearch.addForward(Events.ON_CHANGE, this, Events.ON_CHANGE);
+		cmbFilteredSearch.setDisabled(Boolean.parseBoolean(getDisabled()));
 	}
 	
 }
