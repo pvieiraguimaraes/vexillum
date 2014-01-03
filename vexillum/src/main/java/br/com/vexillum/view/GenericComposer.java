@@ -85,6 +85,10 @@ public class GenericComposer<U extends UserBasic> extends
 		binder.loadAll();
 	}
 	
+	public void saveBinder() {
+		binder.saveAll();;
+	}
+	
 	public void loadComponent(Component component){
 		binder.loadComponent(component);
 	}
