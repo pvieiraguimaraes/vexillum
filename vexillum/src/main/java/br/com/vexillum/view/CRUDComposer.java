@@ -101,10 +101,15 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 	}
 	
 	public Return saveEntity(Boolean transactionControlled) {
+		Return ret;
 		if (getEntity().getId() != null && getEntity().getId() != 0) {
-			return getControl().doAction("update", transactionControlled);
+			ret = getControl().doAction("update", transactionControlled);
 		}
-		return getControl().doAction("save", transactionControlled);
+		ret = getControl().doAction("save", transactionControlled);
+		if(ret.isValid()){
+			clearForm();
+		}
+		return ret;
 	}
 
 	public Return deactivateEntity() {
@@ -180,7 +185,7 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 	}
 
 	protected void clearForm() {
-		entity = getEntityObject();
+		initEntity();
 	}
 
 	public void callModalWindow(String page) {
