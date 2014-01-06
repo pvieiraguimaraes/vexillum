@@ -104,9 +104,10 @@ public abstract class CRUDComposer<E extends ICommonEntity, G extends GenericCon
 		Return ret;
 		if (getEntity().getId() != null && getEntity().getId() != 0) {
 			ret = getControl().doAction("update", transactionControlled);
-		}
-		ret = getControl().doAction("save", transactionControlled);
-		if(ret.isValid()){
+		} else
+			ret = getControl().doAction("save", transactionControlled);
+
+		if (ret.isValid()) {
 			clearForm();
 		}
 		return ret;
