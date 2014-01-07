@@ -216,6 +216,10 @@ public class GenericControl<E extends ICommonEntity> implements IGenericControl<
 	}
 	
 	public Return deactivate(){
+		return deactivate(getEntity());
+	}
+	
+	public Return deactivate(E entity){
 		if(!(entity instanceof IActivatedEntity))
 			throw new IllegalArgumentException("Entidade Inválida. A mesma de ver herdar da interface IActivatedEntity!");
 		((IActivatedEntity)entity).setActive(false);
