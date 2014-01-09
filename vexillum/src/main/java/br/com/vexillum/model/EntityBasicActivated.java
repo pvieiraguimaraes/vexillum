@@ -11,7 +11,7 @@ import br.com.vexillum.model.annotations.Validate;
 public class EntityBasicActivated extends CommonEntityActivated {
 
 	@SearchField
-	@Validate(notNull=true, min=3, max=200)
+	@Validate(notNull=true, min=3, max=200, unique=true, caseSensitive=false)
 	@Column(name="name", nullable=false, updatable=true, unique=true, length=200)
 	protected String name;
 	

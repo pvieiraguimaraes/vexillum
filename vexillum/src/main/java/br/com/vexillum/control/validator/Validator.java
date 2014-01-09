@@ -10,6 +10,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.util.StringUtils;
 
 import br.com.vexillum.configuration.Properties;
+import br.com.vexillum.control.ValidatorController;
 import br.com.vexillum.control.manager.ExceptionManager;
 import br.com.vexillum.model.CommonEntity;
 import br.com.vexillum.model.IActivatedEntity;
@@ -120,9 +121,9 @@ public class Validator {
 				Validate annot = field.getAnnotation(Validate.class);
 				for (Object method : annot.getClass().getDeclaredMethods()) {
 					if(ReflectionUtils.haveMethod(((Method)method).getName(), thisClass)){
-						Method m = thisClass.getMethod(((Method)method).getName(), new Class[]{ String.class, Object.class, Object.class});
+						Method m = thisClass.getMethod(((Method)method).getName(), new Class[]{ Field.class, Object.class, Object.class});
 						Object obj = ReflectionUtils.getMethodValue(annot, ((Method)method).getName());
-						ret.concat((Return) m.invoke(this, new Object[] { field.getName(), field.get(entity), obj}));
+						ret.concat((Return) m.invoke(this, new Object[] { field, field.get(entity), obj}));
 					}
 				}
 			}
@@ -142,9 +143,9 @@ public class Validator {
 				for (Object method : annot.getClass().getDeclaredMethods()) {
 					if(((String)method).equalsIgnoreCase(validation)){
 						if(ReflectionUtils.haveMethod(((Method)method).getName(), thisClass)){
-							Method m = thisClass.getMethod(((Method)method).getName(), new Class[]{ String.class, Object.class, Object.class});
+							Method m = thisClass.getMethod(((Method)method).getName(), new Class[]{ Field.class, Object.class, Object.class});
 							Object obj = ReflectionUtils.getMethodValue(annot, ((Method)method).getName());
-							ret.concat((Return) m.invoke(this, new Object[] { field.getName(), field.get(entity), obj}));
+							ret.concat((Return) m.invoke(this, new Object[] { field, field.get(entity), obj}));
 							if(!ret.isValid()) continue;
 						}
 					}
@@ -174,6 +175,15 @@ public class Validator {
 	} 
 	
 	//INICIO METODOS DAS VALIDA��ES
+	public Return notNull(Field field, Object valField, Object valAnoted){
+		Return ret = new Return(true);		
+		if((Boolean) valAnoted){
+			if(valField == null || valField.toString().isEmpty())
+				ret = creatReturn(field.getName(), getValidationMessage(field.getName(), "notNull", false));
+		}
+		return ret;
+	}
+	
 	public Return notNull(String name, Object valField, Object valAnoted){
 		Return ret = new Return(true);		
 		if((Boolean) valAnoted){
@@ -183,56 +193,88 @@ public class Validator {
 		return ret;
 	}
 	
-	public Return min(String name, Object valField, Object valAnoted){
+	public Return min(Field field, Object valField, Object valAnoted){
 		Return ret = new Return(true);
 		
 		if(isNotNulle(valField) && isNotNulle(valAnoted) && (Integer)valAnoted > 0){
 			Integer v1 = valField.toString().length();
 			if((v1 < (Integer)valAnoted))
-				ret = creatReturn(name, getValidationMessage(name, "min", false) + (Integer)valAnoted);
+				ret = creatReturn(field.getName(), getValidationMessage(field.getName(), "min", false) + (Integer)valAnoted);
 		}
 		return ret;
 	}
 	
-	public Return max(String name, Object valField, Object valAnoted){
+	public Return max(Field field, Object valField, Object valAnoted){
 		Return ret = new Return(true);
 		if(isNotNulle(valField) && isNotNulle(valAnoted) && (Integer)valAnoted > 0){
 			Integer v1 = valField.toString().length();
 		if(v1 > (Integer)valAnoted)
-			ret = creatReturn(name, getValidationMessage(name, "max", false) + (Integer)valAnoted);
+			ret = creatReturn(field.getName(), getValidationMessage(field.getName(), "max", false) + (Integer)valAnoted);
 		}
 		return ret;
 	}
 	
-	public Return past(String name, Object valField, Object valAnoted){
+	public Return past(Field field, Object valField, Object valAnoted){
 		Return ret = new Return(true);		
 		if((Boolean) valAnoted && valField != null){
 			if(((Date) valField).before(new Date()))
-				ret = creatReturn(name, getValidationMessage(name, "past", false));
+				ret = creatReturn(field.getName(), getValidationMessage(field.getName(), "past", false));
 		} 
 		return ret;
 	}
 	
-	public Return future(String name, Object valField, Object valAnoted){
+	public Return future(Field field, Object valField, Object valAnoted){
 		Return ret = new Return(true);		
 		if((Boolean) valAnoted  && valField != null){
 			if( ((Date) valField).after(new Date()))
-				ret = creatReturn(name, getValidationMessage(name, "future", false));
+				ret = creatReturn(field.getName(), getValidationMessage(field.getName(), "future", false));
 		} 
 		return ret;
 	}
 	
-	public Return email(String name, Object valField, Object valAnoted){
+	public Return email(Field field, Object valField, Object valAnoted){
 		Return ret = new Return(true);
 		String regex = "^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]*(.){1}[a-zA-Z]{2,4})+$";
 		if((Boolean) valAnoted){
 			if(valField == null || !Pattern.matches(regex, (String) valField))
-				ret = creatReturn(name, getValidationMessage(name, "email", false));
+				ret = creatReturn(field.getName(), getValidationMessage(field.getName(), "email", false));
 		} 
 		return ret;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public Return unique(Field field, Object valField, Object valAnoted) throws Exception{
+		Return ret = new Return(true);
+		if((Boolean) valAnoted){
+			Boolean caseSensitive = getCaseSensitive(field);
+			String sql = mountHQL(field.getName(), valField, caseSensitive);
+			ValidatorController controller = SpringFactory.getController("validatorController", ValidatorController.class, null);
+			controller.getData().put("sql", sql);
+			Return auxRet = controller.searchByHQL();
+			if(auxRet.getList() != null && !auxRet.getList().isEmpty()){
+				ret = creatReturn(field.getName(), getValidationMessage(field.getName(), "unique", false));
+			}
+		}
+		return ret;
+	}
 	
+	
+	private Boolean getCaseSensitive(Field field) throws Exception {
+		Validate validate = field.getAnnotation(Validate.class);
+		Object obj = ReflectionUtils.getMethodValue(validate, "caseSensitive");
+		return (Boolean) obj;
+	}
+
+	private String mountHQL(String name, Object valField, Boolean caseSensitive) {
+		String sql = "FROM " + classEntity.getSimpleName();
+		if(caseSensitive){
+			sql += " WHERE " + name + " = '" + valField + "'";
+		} else {
+			sql += " WHERE UPPER(" + name + ") = UPPER('" + valField + "')";
+		}
+		return sql;
+	}
+
 	public Return equalsFields(String field1, String field2){
 		Return ret = new Return(true);	
 		if(field1 != null){
