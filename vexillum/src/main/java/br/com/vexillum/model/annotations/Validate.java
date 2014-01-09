@@ -14,4 +14,6 @@ public @interface Validate {
 	boolean past() default false;
 	boolean future() default false;
 	boolean email() default false;
+	boolean unique() default false;
+	boolean caseSensitive() default true;
 }
