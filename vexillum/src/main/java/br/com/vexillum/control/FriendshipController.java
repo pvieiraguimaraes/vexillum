@@ -96,6 +96,20 @@ public class FriendshipController extends GenericControl<Friendship> {
 		}
 		return super.delete();
 	}
+
+	public Boolean isFriend(UserBasic entity, UserBasic userInSession) {
+		if(entity.equals(userInSession)){
+			return null;
+		} else {
+			getData().put("user", entity);
+			for (Object friendship : searchAllFriends().getList()) {
+				if(((Friendship) friendship).getOwner().equals(userInSession) || ((Friendship) friendship).getFriend().equals(userInSession)){
+					return true;
+				}
+			}
+			return false;
+		}
+	}
 	
 	
 	
