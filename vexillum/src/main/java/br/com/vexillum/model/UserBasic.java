@@ -40,7 +40,7 @@ public class UserBasic extends CommonEntityActivated {
 	@Column(name = "password", unique = false, nullable = false, updatable = true, length = 200)
 	private String password;
 
-	@Validate(notNull = true, future = true)
+	@Validate(notNull = true, past = true)
 	@Column(name = "birthDate", unique = false, nullable = false, updatable = true, length = 50)
 	private Date birthDate;
 
