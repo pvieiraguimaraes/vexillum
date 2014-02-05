@@ -21,7 +21,7 @@ public class CallbackTwitter extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	SocialConnections connection = SpringFactory.getInstance().getBean("facebookConnection", SocialConnections.class);
+    	SocialConnections connection = SpringFactory.getInstance().getBean("socialConnections", SocialConnections.class);
         Twitter twitter = connection.getTwitter();
         RequestToken requestToken = connection.getRequestToken();
         
