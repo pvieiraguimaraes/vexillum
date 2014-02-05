@@ -20,7 +20,7 @@ public class CallbackFacebook extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Facebook facebook = SpringFactory.getInstance().getBean("facebookConnection", SocialConnections.class).getFacebook();
+        Facebook facebook = SpringFactory.getInstance().getBean("socialConnections", SocialConnections.class).getFacebook();
         String oauthCode = request.getParameter("code");
         try {
             facebook.getOAuthAccessToken(oauthCode);
