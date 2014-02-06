@@ -41,7 +41,7 @@ public class FriendshipController extends GenericControl<Friendship> {
 	public Return searchAllFriends(){
 		UserBasic user = (UserBasic) data.get("user");
 		String sql = "FROM Friendship f "
-					+ "WHERE (f.owner = '" + user.getId() + "' OR f.friend = '" + user.getId() + "') AND f.active = true";
+					+ "WHERE (f.owner = '" + user.getId() + "' OR f.friend = '" + user.getId() + "') AND (f.owner.active = true AND f.friend.active = true) AND f.active = true";
 		data.put("sql", sql);
 		return searchByHQL();
 	}

@@ -31,7 +31,7 @@ public class UserBasic extends CommonEntityActivated {
 	@Column(name = "name", unique = false, nullable = false, updatable = true, length = 200)
 	private String name;
 
-	@Validate(notNull = true, min = 5, max = 200)
+	@Validate(notNull = true, min = 5, max = 200, email=true)
 	@SearchField
 	@Column(name = "email", unique = true, nullable = false, updatable = false, length = 200)
 	private String email;
@@ -40,7 +40,7 @@ public class UserBasic extends CommonEntityActivated {
 	@Column(name = "password", unique = false, nullable = false, updatable = true, length = 200)
 	private String password;
 
-	@Validate(notNull = true, past = true)
+	@Validate(notNull = true, future = true)
 	@Column(name = "birthDate", unique = false, nullable = false, updatable = true, length = 50)
 	private Date birthDate;
 

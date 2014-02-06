@@ -9,6 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 import br.com.vexillum.model.annotations.ValidatorClass;
 
 @SuppressWarnings("serial")
@@ -24,10 +27,12 @@ public class Friendship extends CommonEntityActivated {
 	}
 
 	@ManyToOne(fetch=FetchType.LAZY)
+	@Cascade(CascadeType.ALL)
     @JoinColumn(name="id_owner", unique=false, nullable=false, updatable=false)
 	private UserBasic owner;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
+	@Cascade(CascadeType.ALL)
     @JoinColumn(name="id_friend", unique=false, nullable=false, updatable=false)
 	private UserBasic friend;
 	
