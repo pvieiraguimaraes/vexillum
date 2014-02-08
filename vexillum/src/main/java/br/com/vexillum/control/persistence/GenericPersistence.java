@@ -247,6 +247,8 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 	        		criterias.add(field.getName() + " like " + "'%" + value + "%'");
 	        	} else if(value instanceof Enum){
 	        		criterias.add(field.getName() + "=" + "'" + ((Enum<?>)value).ordinal() + "'");
+	        	} else if(value instanceof Boolean){
+	        		criterias.add(field.getName() + "=" + value);
 	        	}else {
 	        		criterias.add(field.getName() + "=" + "'" + value + "'");
 	        	}
