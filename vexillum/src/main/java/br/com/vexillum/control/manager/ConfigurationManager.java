@@ -14,10 +14,22 @@ import br.com.vexillum.model.UserProperties;
 import br.com.vexillum.model.UserPropertiesCategory;
 import br.com.vexillum.util.SpringFactory;
 
+/**
+ * Gerenciador das configurações do sistema.
+ * @author fernando.lopes
+ *
+ */
 public class ConfigurationManager implements IManager {	
 
+	/**
+	 * Classe singleton do gerenciador.
+	 */
 	static ConfigurationManager manager;
 	
+	/**
+	 * Pega uma única instancia do {@link ConfigurationManager}
+	 * @return {@link ConfigurationManager}
+	 */
 	public static ConfigurationManager getManager(){
 		if(manager == null){
 			manager = new ConfigurationManager();
@@ -25,6 +37,12 @@ public class ConfigurationManager implements IManager {
 		return manager;
 	}
 	
+	/**
+	 * Pega a configuração de um usuário, baseado na chave.
+	 * @param key Chave da configuração
+	 * @param user Usuário
+	 * @return Valor da configuração
+	 */
 	public String getProperty(String key, UserBasic user){
 		String value = "";
 		value = searchInSystemsProperties(key);
@@ -36,6 +54,11 @@ public class ConfigurationManager implements IManager {
 		return value;
 	}
 	
+	/**
+	 * Procura a configuração nas configurações do sistema.
+	 * @param key Chave da configuração
+	 * @return Valor da configuração
+	 */
 	private String searchInSystemsProperties(String key){
 		SystemProperties prop = getSystemPropertyInstance(key);
 		if(prop == null || prop.getValue() == null ||  prop.getValue().isEmpty()){
@@ -44,6 +67,11 @@ public class ConfigurationManager implements IManager {
 		return prop.getValue();
 	}
 	
+	/**
+	 * Procura a configuração nas configurações do usuário.
+	 * @param key Chave da configuração
+	 * @return Valor da configuração
+	 */
 	private String searchInConfigurations(String key, UserBasic user){
 		Configuration conf = getConfigurationInstance(key, user);
 		if(conf == null || conf.getValue() == null || conf.getValue().isEmpty()){
@@ -52,6 +80,11 @@ public class ConfigurationManager implements IManager {
 		return conf.getValue();
 	}
 	
+	/**
+	 * Procura a configuração nas configurações do usuário.
+	 * @param key Chave da configuração
+	 * @return Valor da configuração
+	 */
 	@SuppressWarnings("unused")
 	private String searchInUserProperties(String key){
 		UserProperties prop = getUserPropertyInstance(key);
@@ -61,6 +94,12 @@ public class ConfigurationManager implements IManager {
 		return prop.getDefaultValue();
 	}
 	
+	
+	/**
+	 * Retorna a instancia de um {@link UserProperties}.
+	 * @param key Chave da configuração
+	 * @return Instancia da configuração
+	 */
 	@SuppressWarnings("unchecked")
 	public UserProperties getUserPropertyInstance(String key){
 		HashMap<String, Object> data =  new HashMap<String, Object>();
@@ -78,6 +117,11 @@ public class ConfigurationManager implements IManager {
 		return aux.get(0);
 	}
 	
+	/**
+	 * Retorna a instancia de um {@link SystemProperties}
+	 * @param key Chave da configuração
+	 * @return Instancia da configuração
+	 */
 	public SystemProperties getSystemPropertyInstance(String key){
 		HashMap<String, Object> data =  new HashMap<String, Object>();
 		
@@ -101,6 +145,11 @@ public class ConfigurationManager implements IManager {
 		return prop;
 	}
 	
+	/**
+	 * Retorna a instancia de um {@link Configuration}
+	 * @param key Chave da configuração
+	 * @return Instancia da configuração
+	 */
 	@SuppressWarnings("unchecked")
 	public Configuration getConfigurationInstance(String key, UserBasic user){
 		HashMap<String, Object> data =  new HashMap<String, Object>();
@@ -126,6 +175,11 @@ public class ConfigurationManager implements IManager {
 		return aux.get(0);
 	}
 	
+	/**
+	 * Carrega as configurações do usuário, baseado em uma categoria.
+	 * @param cat Categoria
+	 * @return Lista de {@link UserProperties}
+	 */
 	@SuppressWarnings("unchecked")
 	public List<UserProperties> getUserPropertiesByCategory(UserPropertiesCategory cat){
 		HashMap<String, Object> data =  new HashMap<String, Object>();
@@ -141,6 +195,11 @@ public class ConfigurationManager implements IManager {
 		return list;
 	}
 	
+	/**
+	 * Carrega as configurações do sistema, baseado em uma categoria.
+	 * @param cat Categoria
+	 * @return Lista de {@link SystemProperties}
+	 */
 	@SuppressWarnings("unchecked")
 	public List<SystemProperties> getSystemPropertiesByCategory(SystemPropertiesCategory cat){
 		HashMap<String, Object> data =  new HashMap<String, Object>();

@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Fernando Augusto Silva Lopes
- *Classe responsável pelo log da aplicação
- * @param <T> Classe a qual o logger irá se aplicar.
+ *Classe responsÃ¡vel pelo log da aplicaÃ§Ã£o
+ * @param <T> Classe a qual o logger irÃ¡ se aplicar.
  */
 public abstract class Logging<T> {
 	
@@ -27,7 +27,7 @@ public abstract class Logging<T> {
 	}
 	
 	/**
-	 * Sobrepõe a lista de mensagens que serão usadas na geração do log.
+	 * Sobrepï¿½e a lista de mensagens que serÃ£o usadas na geraÃ§Ã£oo do log.
 	 * @param messages Lista de mensagens
 	 */
 	public void addMessages(ArrayList<String> messages){
@@ -35,7 +35,7 @@ public abstract class Logging<T> {
 	}
 	
 	/**
-	 * Adiciona uma mensagem a lista de mensagens que serão usadas no log.
+	 * Adiciona uma mensagem a lista de mensagens que serÃ£o usadas no log.
 	 * @param message Mensagem a ser adicionada
 	 */
 	public void addMessages(String message){
@@ -46,8 +46,8 @@ public abstract class Logging<T> {
 	}
 	
 	/**
-	 * Criação da lista de mensagens a ser usada no log.
-	 * @return Um lista de mensagens formatadas no padrão de uma mensagem por linha.
+	 * Criaï¿½ï¿½o da lista de mensagens a ser usada no log.
+	 * @return Um lista de mensagens formatadas no padrÃ£o de uma mensagem por linha.
 	 */
 	protected String getMessage(){
 		String message = "";
@@ -58,7 +58,7 @@ public abstract class Logging<T> {
 	}
 		
 	/**
-	 * Método abstrato que define a forma como o log será feito, dever ser especificado em toda classe herdada.
+	 * Mï¿½todo abstrato que define a forma como o log serÃ¡ feito, dever ser especificado em toda classe herdada.
 	 */
 	public abstract void resgisterLog();	
 	

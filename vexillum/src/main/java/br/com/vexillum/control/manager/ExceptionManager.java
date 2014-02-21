@@ -7,7 +7,7 @@ import br.com.vexillum.util.SpringFactory;
 
 /**
  * @author Fernando Augusto Silva Lopes
- *Class de gerenciamento de exce��o
+ *Class de gerenciamento de exceção
  */
 public class ExceptionManager implements IManager {
 	
@@ -15,7 +15,7 @@ public class ExceptionManager implements IManager {
 	private Exception e;
 	
 	/**
-	 * Construtodo gerenciador de exce��o, iniciado a o properties de exce��es.
+	 * Construtodo gerenciador de exceção, iniciado a o properties de exceções.
 	 * @param e Exce��o a ser gerenciada
 	 */
 	public ExceptionManager(Exception e){

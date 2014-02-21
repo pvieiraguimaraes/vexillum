@@ -9,12 +9,19 @@ import javax.annotation.PostConstruct;
 
 
 /**
- * @author e670560
+ * @author Fernando
  *Classe respons�vel por criar os properties, esta classe deve ser extendida de especializa��es. Ex: Email, Configs, etc.
  */
 public class Properties{
 	
+	/**
+	 * Caminho do Properties da pasta resources
+	 */
 	protected String pathName;
+	
+	/**
+	 * Representa efetivamente o properties
+	 */
 	protected ResourceBundle config;
     
 	public String getPathName() {
@@ -25,6 +32,10 @@ public class Properties{
 		this.pathName = pathName;
 	}
 
+	/**
+	 * Inicializa o {@link ResourceBundle} baseado na no caminho e local onde está o servidor.
+	 * @throws IOException
+	 */
 	@PostConstruct
 	public void createResourceBundle() throws IOException{
 		treatPathName();
@@ -36,6 +47,9 @@ public class Properties{
 		
 	}
 	
+	/**
+	 * Trata o caminho do properties.
+	 */
 	private void treatPathName(){
 		Integer i = pathName.lastIndexOf(".properties");
 		if(i != -1){
@@ -44,7 +58,7 @@ public class Properties{
 	}
 
 	/**
-     * Fun��o que retorna um valor do properties, baseado na key.
+     * Função que retorna um valor do properties, baseado na key.
      * @param key
      * @return String
      */
