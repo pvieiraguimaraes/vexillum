@@ -3,7 +3,7 @@ package br.com.vexillum.control.logger;
 
 /**
  * @author Fernando Augusto Silva Lopes
- *Classe responsável pelo log de Exceções
+ *Classe responsï¿½vel pelo log de ExceÃ§Ãµes
  */
 public class ExceptionLogger extends Logging<Exception> {
 

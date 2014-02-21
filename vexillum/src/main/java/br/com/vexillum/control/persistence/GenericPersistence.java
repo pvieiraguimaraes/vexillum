@@ -20,11 +20,26 @@ import br.com.vexillum.model.ICommonEntity;
 import br.com.vexillum.util.ReflectionUtils;
 import br.com.vexillum.util.Return;
 
+/**
+ * Classe com as ações de persistência uasadas em todas as ações do sistema.
+ *
+ * @param <E> Entidade que herde de {@link ICommonEntity}
+ */
 public class GenericPersistence<E extends ICommonEntity> implements IGenericPersistence<ICommonEntity> {
 
+	/**
+	 * {@link SessionFactory} do hibernate
+	 */
 	private SessionFactory sessionFactory;
 	
+	/**
+	 * Sessão do hibernate
+	 */
 	Session session;
+	
+	/**
+	 * Transação usada nas ações.
+	 */
 	Transaction tx;
 	
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -43,12 +58,18 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		return getSession().getTransaction();
 	}
 	
+	/**
+	 * Inicia uma nova {@link Transaction} caso não esteja ativa.
+	 */
 	public void beginTransaction(){
 		if(tx== null || !getTransaction().isActive()){
 			tx = getSession().beginTransaction();
 		}		
 	}
 	
+	/**
+	 * Realiza o commit em uma {@link Transaction}, caso ainda tenha sido feito
+	 */
 	public void commitTransaction(){
 		if(!getTransaction().wasCommitted()){
 			getTransaction().commit();
@@ -56,6 +77,9 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		flushSession();
 	}
 	
+	/**
+	 * Realiza o rollback em uma transação aberta, caso ainda não tenha sido feito
+	 */
 	public void rollbackTransaction(){
 		if(getTransaction() != null && !getTransaction().wasRolledBack()){
 			try {
@@ -68,10 +92,16 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		flushSession();
 	}
 	
+	/**
+	 * Limpa a sessão aberta.
+	 */
 	public void flushSession(){
 		getSession().flush();
 	}
 	
+	/**
+	 * Fecha a sessão aberta.
+	 */
 	@SuppressWarnings("unused")
 	private void closeSession(){
 		if(getSession().isOpen()){
@@ -79,6 +109,9 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see br.com.vexillum.control.persistence.IGenericPersistence#save(java.lang.Object)
+	 */
 	@Override
 	public Return save(ICommonEntity entity) {
 		Return ret = null;
@@ -93,6 +126,9 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		return ret;
 	}
 
+	/* (non-Javadoc)
+	 * @see br.com.vexillum.control.persistence.IGenericPersistence#searchByCriteria(java.lang.Object)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Return searchByCriteria(ICommonEntity entity) {
@@ -229,6 +265,12 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
         return ret;
 	}
 	
+	/**
+	 * Transforma as atributos preeenchidos de uma entidade em condições, via HQL.
+	 * @param entity Entidade a ser tomada como referêcnia
+	 * @param prefix Prefixo das condições
+	 * @return
+	 */
 	private List<String> setCriterias(ICommonEntity entity, String prefix){
 		List<String> criterias = new ArrayList<String>();
 		 try {
@@ -260,6 +302,11 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		return criterias;
 	}
 	
+	/**
+	 * Adiciona o prefixo as consições.
+	 * @param prefix Prefixo
+	 * @param list Lista de condições
+	 */
 	private void addPrefixOnList(String prefix, List<String> list){
 		if(prefix != null){
 			for (int i = 0; i < list.size(); i++) {
@@ -301,6 +348,12 @@ public class GenericPersistence<E extends ICommonEntity> implements IGenericPers
 		return ret;
 	}
 	
+	/**
+	 * Busca uam entidade baseada no ID.
+	 * @param id ID a ser pesquisado.
+	 * @param classz Classe que será pesquisada.
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public E getById(Long id, Class<?> classz){
 		try {
