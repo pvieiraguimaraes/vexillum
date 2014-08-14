@@ -23,7 +23,7 @@ import br.com.vexillum.model.enums.Sexo;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER)
-@Table(name = "users")
+@Table(name = "usuario")
 public class UserBasic extends CommonEntityActivated {
 
 	@Validate(notNull = true, min = 2, max = 200)
